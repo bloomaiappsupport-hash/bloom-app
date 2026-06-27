@@ -32,6 +32,11 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
+
+# Store submission secrets
+google-service-account.json
+*.keystore
 
 # typescript
 *.tsbuildinfo

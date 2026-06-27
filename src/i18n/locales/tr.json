@@ -1,0 +1,150 @@
+{
+  "common": {
+    "continue": "Devam Et",
+    "skip": "Atla",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "done": "Tamamlandı",
+    "back": "Geri",
+    "next": "İleri",
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "retry": "Tekrar Dene",
+    "yes": "Evet",
+    "no": "Hayır"
+  },
+  "auth": {
+    "welcome": "Tekrar hoş geldin",
+    "signIn": "Giriş Yap",
+    "signUp": "Hesap Oluştur",
+    "email": "E-posta",
+    "password": "Şifre",
+    "forgotPassword": "Şifremi Unuttum",
+    "continueWithGoogle": "Google ile Devam Et",
+    "continueWithApple": "Apple ile Devam Et",
+    "noAccount": "Hesabın yok mu?",
+    "hasAccount": "Zaten hesabın var mı?"
+  },
+  "onboarding": {
+    "step1": {
+      "title": "Bloomnı İnşa Et",
+      "subtitle": "Alışkanlıkların, enerjini şekillendirir. BLOOM ile her gün biraz daha güçlen."
+    },
+    "step2": {
+      "title": "AI Koçun Seni Tanır",
+      "subtitle": "Sadece takip değil — gerçek koçluk. Engellerin, motivasyonun, örüntülerin."
+    },
+    "step3": {
+      "title": "Ritual Stack'ler Yarat",
+      "subtitle": "Alışkanlıkları zincirleriyle bir bütün haline getir. Sabah ritüelin bir gün gibi başlasın."
+    },
+    "step4": {
+      "title": "Habit DNA'nı Keşfet",
+      "subtitle": "Kişisel alışkanlık profilin. Güçlü yönlerin, gelişim alanların görünür hale geliyor."
+    },
+    "step5": {
+      "title": "Hazır mısın?",
+      "subtitle": "8 hızlı soru ile aurana özel bir başlangıç hazırlıyoruz."
+    }
+  },
+  "assessment": {
+    "title": "Seni Tanıyalım",
+    "subtitle": "AI koçun için kişisel profilini oluşturuyoruz",
+    "q1": "Günün hangi bölümünde daha enerjik hissediyorsun?",
+    "q2": "Birincil hedefin nedir?",
+    "q3": "Geçmişte alışkanlık oluşturmada en büyük engelin neydi?",
+    "q4": "Günde kaç yeni alışkanlıkla başlamak istersin?",
+    "q5": "Motivasyonun nasıl çalışır?",
+    "q6": "Hangi alan sana en çok çekici geliyor?",
+    "q7": "Hatırlatıcılar konusunda nasılsın?",
+    "q8": "Kendini nasıl tanımlarsın?"
+  },
+  "home": {
+    "greeting_morning": "Günaydın",
+    "greeting_afternoon": "İyi öğlenler",
+    "greeting_evening": "İyi akşamlar",
+    "greeting_night": "İyi geceler",
+    "todayProgress": "Bugünkü İlerleme",
+    "streakDays": "{{count}} günlük seri",
+    "moodCheckIn": "Bugün nasıl hissediyorsun?",
+    "noHabitsToday": "Bugün için alışkanlık yok",
+    "addFirstHabit": "İlk alışkanlığını ekle",
+    "completedAll": "Hepsini tamamladın! Muhteşem."
+  },
+  "habits": {
+    "title": "Alışkanlıklar",
+    "add": "Alışkanlık Ekle",
+    "edit": "Alışkanlığı Düzenle",
+    "delete": "Alışkanlığı Sil",
+    "deleteConfirm": "Bu alışkanlığı silmek istediğine emin misin?",
+    "category": {
+      "fitness": "Fitness",
+      "mind": "Zihin",
+      "sleep": "Uyku",
+      "nutrition": "Beslenme",
+      "social": "Sosyal",
+      "work": "Kariyer",
+      "custom": "Özel"
+    },
+    "frequency": {
+      "daily": "Her gün",
+      "weekly": "Haftalık",
+      "custom": "Özel"
+    },
+    "streak": "gün serisi",
+    "swipeToComplete": "Tamamlamak için kaydır"
+  },
+  "coach": {
+    "title": "AI Koç",
+    "placeholder": "Bir şey sor veya paylaş...",
+    "thinking": "Düşünüyor...",
+    "limitReached": "Günlük mesaj limitine ulaştın",
+    "upgradeForMore": "Sınırsız konuşma için Premium'a geç",
+    "suggestions": {
+      "analyze": "Alışkanlıklarımı analiz et",
+      "barrier": "Engellerin üstesinden gelmeye yardım et",
+      "suggest": "Yeni alışkanlık öner",
+      "motivation": "Motive et beni"
+    }
+  },
+  "insights": {
+    "title": "İçgörüler",
+    "habitDna": "Habit DNA",
+    "weeklyReport": "Haftalık Rapor",
+    "streak": "Seri",
+    "completionRate": "Tamamlama Oranı",
+    "bestDay": "En İyi Gün",
+    "moodAvg": "Ortalama Ruh Hali",
+    "noInsights": "Henüz yeterli veri yok. Birkaç gün sonra görüntüle."
+  },
+  "profile": {
+    "title": "Profil",
+    "premium": "Premium",
+    "upgradeToPremium": "Premium'a Geç",
+    "settings": "Ayarlar",
+    "notifications": "Bildirimler",
+    "language": "Dil",
+    "signOut": "Çıkış Yap",
+    "version": "Versiyon {{version}}"
+  },
+  "premium": {
+    "title": "BLOOM Premium",
+    "subtitle": "Tam potansiyelini ortaya çıkar",
+    "monthly": "Aylık",
+    "yearly": "Yıllık",
+    "yearlyDiscount": "%35 indirim",
+    "subscribe": "Abone Ol",
+    "restore": "Satın Alımı Geri Yükle",
+    "features": {
+      "unlimited_habits": "Sınırsız alışkanlık",
+      "unlimited_coach": "Sınırsız AI koç mesajı",
+      "streak_shield": "2 streak kalkanı / ay",
+      "habit_dna": "Detaylı Habit DNA + paylaşım",
+      "weekly_report": "Haftalık AI raporu",
+      "unlimited_stacks": "Sınırsız Ritual Stack",
+      "unlimited_history": "Sınırsız geçmiş"
+    }
+  }
+}

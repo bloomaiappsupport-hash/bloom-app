@@ -1,0 +1,76 @@
+const base = {
+  primary: '#7C3AED',
+  primaryGlow: '#9D5CF5',
+  primaryDim: '#6D28D9',
+  secondary: '#06D6A0',
+  accent: '#F72585',
+  gold: '#FFB703',
+  info: '#38BDF8',
+  success: '#06D6A0',
+  error: '#EF4444',
+  warning: '#F59E0B',
+  gradientPurple: ['#7C3AED', '#4C1D95'] as [string, string],
+  gradientMint: ['#06D6A0', '#0891B2'] as [string, string],
+  gradientFire: ['#F72585', '#FF6B35'] as [string, string],
+  gradientGold: ['#FFB703', '#FB8500'] as [string, string],
+};
+
+export const darkColors = {
+  ...base,
+  bg: '#080812',
+  surface: '#0F0F23',
+  surface2: '#161630',
+  surface3: '#1C1C40',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#8B8BA7',
+  textMuted: '#4A4A6A',
+  border: '#1E1E3A',
+  borderLight: '#2A2A50',
+  gradientDark: ['#0F0F23', '#080812'] as [string, string],
+  fitness: '#06D6A0',
+  mind: '#7C3AED',
+  sleep: '#38BDF8',
+  nutrition: '#FB8500',
+  social: '#F72585',
+  work: '#FFB703',
+  overlay: 'rgba(8, 8, 18, 0.85)',
+  glassWhite: 'rgba(255, 255, 255, 0.06)',
+  glassBorder: 'rgba(255, 255, 255, 0.10)',
+  glassTint: 'dark' as const,
+  glassOverlay: 'rgba(15, 15, 35, 0.60)',
+  gradStart: '#0D0622',
+  gradEnd: '#080812',
+};
+
+export const lightColors = {
+  ...base,
+  bg: '#F7F3FF',
+  surface: '#FFFFFF',
+  surface2: '#F0EBFF',
+  surface3: '#E8E1FF',
+  textPrimary: '#1C1033',
+  textSecondary: '#4B4569',
+  textMuted: '#9188B8',
+  border: '#E4DCFB',
+  borderLight: '#EDE8FF',
+  gradientDark: ['#F0EBFF', '#F7F3FF'] as [string, string],
+  fitness: '#059669',
+  mind: '#7C3AED',
+  sleep: '#0369A1',
+  nutrition: '#C2410C',
+  social: '#DB2777',
+  work: '#B45309',
+  overlay: 'rgba(247, 243, 255, 0.90)',
+  glassWhite: 'rgba(124, 58, 237, 0.04)',
+  glassBorder: 'rgba(124, 58, 237, 0.14)',
+  glassTint: 'light' as const,
+  glassOverlay: 'rgba(255, 255, 255, 0.70)',
+  gradStart: '#EDE6FF',
+  gradEnd: '#F7F3FF',
+};
+
+// Auth screens always use dark
+export const colors = darkColors;
+
+export type ColorSet = typeof darkColors;
+export type ColorKey = keyof ColorSet;

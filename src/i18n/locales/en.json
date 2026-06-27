@@ -1,0 +1,150 @@
+{
+  "common": {
+    "continue": "Continue",
+    "skip": "Skip",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "done": "Done",
+    "back": "Back",
+    "next": "Next",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "auth": {
+    "welcome": "Welcome back",
+    "signIn": "Sign In",
+    "signUp": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithApple": "Continue with Apple",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
+  },
+  "onboarding": {
+    "step1": {
+      "title": "Build Your Bloom",
+      "subtitle": "Your habits shape your energy. Grow stronger every day with BLOOM."
+    },
+    "step2": {
+      "title": "Your AI Coach Knows You",
+      "subtitle": "Not just tracking — real coaching. Your barriers, motivation, patterns."
+    },
+    "step3": {
+      "title": "Create Ritual Stacks",
+      "subtitle": "Chain habits into a whole. Let your morning ritual set the tone for the day."
+    },
+    "step4": {
+      "title": "Discover Your Habit DNA",
+      "subtitle": "Your personal habit profile. Strengths and growth areas become visible."
+    },
+    "step5": {
+      "title": "Ready?",
+      "subtitle": "8 quick questions and we build a custom start tailored to your aura."
+    }
+  },
+  "assessment": {
+    "title": "Let's Get to Know You",
+    "subtitle": "Building your personal profile for your AI coach",
+    "q1": "When do you feel most energetic during the day?",
+    "q2": "What is your primary goal?",
+    "q3": "What was your biggest obstacle to building habits in the past?",
+    "q4": "How many new habits would you like to start with per day?",
+    "q5": "How does your motivation work?",
+    "q6": "Which area interests you most?",
+    "q7": "How are you with reminders?",
+    "q8": "How would you describe yourself?"
+  },
+  "home": {
+    "greeting_morning": "Good morning",
+    "greeting_afternoon": "Good afternoon",
+    "greeting_evening": "Good evening",
+    "greeting_night": "Good night",
+    "todayProgress": "Today's Progress",
+    "streakDays": "{{count}} day streak",
+    "moodCheckIn": "How are you feeling today?",
+    "noHabitsToday": "No habits for today",
+    "addFirstHabit": "Add your first habit",
+    "completedAll": "You completed everything! Amazing."
+  },
+  "habits": {
+    "title": "Habits",
+    "add": "Add Habit",
+    "edit": "Edit Habit",
+    "delete": "Delete Habit",
+    "deleteConfirm": "Are you sure you want to delete this habit?",
+    "category": {
+      "fitness": "Fitness",
+      "mind": "Mind",
+      "sleep": "Sleep",
+      "nutrition": "Nutrition",
+      "social": "Social",
+      "work": "Career",
+      "custom": "Custom"
+    },
+    "frequency": {
+      "daily": "Every day",
+      "weekly": "Weekly",
+      "custom": "Custom"
+    },
+    "streak": "day streak",
+    "swipeToComplete": "Swipe to complete"
+  },
+  "coach": {
+    "title": "AI Coach",
+    "placeholder": "Ask something or share...",
+    "thinking": "Thinking...",
+    "limitReached": "You've reached your daily message limit",
+    "upgradeForMore": "Go Premium for unlimited coaching",
+    "suggestions": {
+      "analyze": "Analyze my habits",
+      "barrier": "Help me overcome barriers",
+      "suggest": "Suggest a new habit",
+      "motivation": "Motivate me"
+    }
+  },
+  "insights": {
+    "title": "Insights",
+    "habitDna": "Habit DNA",
+    "weeklyReport": "Weekly Report",
+    "streak": "Streak",
+    "completionRate": "Completion Rate",
+    "bestDay": "Best Day",
+    "moodAvg": "Average Mood",
+    "noInsights": "Not enough data yet. Check back in a few days."
+  },
+  "profile": {
+    "title": "Profile",
+    "premium": "Premium",
+    "upgradeToPremium": "Go Premium",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "language": "Language",
+    "signOut": "Sign Out",
+    "version": "Version {{version}}"
+  },
+  "premium": {
+    "title": "BLOOM Premium",
+    "subtitle": "Unlock your full potential",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "yearlyDiscount": "35% off",
+    "subscribe": "Subscribe",
+    "restore": "Restore Purchase",
+    "features": {
+      "unlimited_habits": "Unlimited habits",
+      "unlimited_coach": "Unlimited AI coach messages",
+      "streak_shield": "2 streak shields / month",
+      "habit_dna": "Detailed Habit DNA + sharing",
+      "weekly_report": "Weekly AI report",
+      "unlimited_stacks": "Unlimited Ritual Stacks",
+      "unlimited_history": "Unlimited history"
+    }
+  }
+}
