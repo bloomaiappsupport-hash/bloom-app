@@ -1,0 +1,5 @@
+{
+  "NSUserNotificationsUsageDescription": "BLOOM needs notifications to remind you at the right time.",
+  "NSCameraUsageDescription": "Camera access is required to add a profile photo.",
+  "NSPhotoLibraryUsageDescription": "Photo library access is required to select a profile photo."
+}

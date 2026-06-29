@@ -1,12 +1,15 @@
 import React, { useMemo, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, Platform, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MainTabParamList } from './types';
 import { radius } from '../theme';
 import { useColors } from '../hooks/useColors';
 import { useAuthStore } from '../stores/authStore';
 import { useHabitStore } from '../stores/habitStore';
 import { habitsService } from '../services/supabase';
+import { requestNotificationPermission } from '../services/notifications';
 import HomeScreen from '../features/home/HomeScreen';
 import HabitsScreen from '../features/habits/HabitsScreen';
 import CoachScreen from '../features/coach/CoachScreen';
@@ -39,6 +42,7 @@ function TabIcon({ name, focused }: { name: string; focused: boolean }) {
 export default function MainNavigator() {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { setHabits, setTodayCompletions, setStreak, setLoadingData } = useHabitStore();
 
@@ -61,6 +65,34 @@ export default function MainNavigator() {
   useEffect(() => {
     if (!user?.id) return;
     loadData(user.id);
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const NOTIF_KEY = '@bloom_notif_requested';
+    const timer = setTimeout(async () => {
+      const already = await AsyncStorage.getItem(NOTIF_KEY);
+      if (already) return;
+      Alert.alert(
+        t('profile.notifOnboarding.title'),
+        t('profile.notifOnboarding.message'),
+        [
+          {
+            text: t('profile.notifOnboarding.skip'),
+            style: 'cancel',
+            onPress: () => AsyncStorage.setItem(NOTIF_KEY, 'skipped'),
+          },
+          {
+            text: t('profile.notifOnboarding.allow'),
+            onPress: async () => {
+              await AsyncStorage.setItem(NOTIF_KEY, 'granted');
+              await requestNotificationPermission();
+            },
+          },
+        ],
+      );
+    }, 2000);
+    return () => clearTimeout(timer);
   }, [user?.id]);
 
   useEffect(() => {
@@ -98,11 +130,11 @@ export default function MainNavigator() {
         ),
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'Ana Sayfa' }} />
-      <Tab.Screen name="Habits" component={HabitsScreen} options={{ tabBarLabel: 'Alışkanlıklar' }} />
-      <Tab.Screen name="Coach" component={CoachScreen} options={{ tabBarLabel: 'Koç' }} />
-      <Tab.Screen name="Insights" component={InsightsScreen} options={{ tabBarLabel: 'İçgörüler' }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Profil' }} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: t('nav.home') }} />
+      <Tab.Screen name="Habits" component={HabitsScreen} options={{ tabBarLabel: t('nav.habits') }} />
+      <Tab.Screen name="Coach" component={CoachScreen} options={{ tabBarLabel: t('nav.coach') }} />
+      <Tab.Screen name="Insights" component={InsightsScreen} options={{ tabBarLabel: t('nav.insights') }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: t('nav.profile') }} />
     </Tab.Navigator>
   );
 }

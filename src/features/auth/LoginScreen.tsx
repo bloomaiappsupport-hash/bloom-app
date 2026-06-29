@@ -8,13 +8,18 @@ import Svg, { Path, G, Rect, Circle } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { AuthStackParamList } from '../../navigation/types';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
+import { AuthStackParamList, RootStackParamList } from '../../navigation/types';
 import { colors, typography, spacing, radius } from '../../theme';
 import { authService } from '../../services/supabase';
 import { GradientButton } from '../../components/common';
 import BloomLogo from '../../components/common/BloomLogo';
 
-type Nav = StackNavigationProp<AuthStackParamList, 'Login'>;
+type Nav = CompositeNavigationProp<
+  StackNavigationProp<AuthStackParamList, 'Login'>,
+  StackNavigationProp<RootStackParamList>
+>;
 
 function GoogleIcon({ size = 20 }: { size?: number }) {
   return (
@@ -40,6 +45,7 @@ function AppleIcon({ size = 20, color = '#fff' }: { size?: number; color?: strin
 
 export default function LoginScreen() {
   const navigation = useNavigation<Nav>();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,7 +56,7 @@ export default function LoginScreen() {
     setLoading(true);
     const { error } = await authService.signInWithEmail(email.trim(), password);
     setLoading(false);
-    if (error) Alert.alert('Giriş Başarısız', error.message);
+    if (error) Alert.alert(t('auth.loginFailed'), error.message);
   };
 
   return (
@@ -65,22 +71,20 @@ export default function LoginScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Logo */}
           <View style={styles.logoArea}>
             <BloomLogo size={72} />
             <Text style={styles.appName}>BLOOM</Text>
-            <Text style={styles.welcomeText}>Tekrar hoş geldin</Text>
+            <Text style={styles.welcomeText}>{t('auth.welcome')}</Text>
           </View>
 
-          {/* Email / password */}
           <View style={styles.form}>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>E-posta</Text>
+              <Text style={styles.inputLabel}>{t('auth.email')}</Text>
               <TextInput
                 style={[styles.input, focused === 'email' && styles.inputFocused]}
                 value={email}
                 onChangeText={setEmail}
-                placeholder="ornek@mail.com"
+                placeholder={t('auth.emailPlaceholder')}
                 placeholderTextColor={colors.textMuted}
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -91,12 +95,12 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Şifre</Text>
+              <Text style={styles.inputLabel}>{t('auth.password')}</Text>
               <TextInput
                 style={[styles.input, focused === 'pw' && styles.inputFocused]}
                 value={password}
                 onChangeText={setPassword}
-                placeholder="••••••••"
+                placeholder={t('auth.passwordPlaceholder')}
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 onFocus={() => setFocused('pw')}
@@ -108,43 +112,40 @@ export default function LoginScreen() {
               onPress={() => navigation.navigate('ForgotPassword')}
               style={styles.forgotBtn}
             >
-              <Text style={styles.forgotText}>Şifremi Unuttum</Text>
+              <Text style={styles.forgotText}>{t('auth.forgotPassword')}</Text>
             </TouchableOpacity>
 
             <GradientButton
-              label="Giriş Yap"
+              label={t('auth.signIn')}
               onPress={handleLogin}
               loading={loading}
             />
           </View>
 
-          {/* Divider */}
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>veya</Text>
+            <Text style={styles.dividerText}>{t('common.or')}</Text>
             <View style={styles.dividerLine} />
           </View>
 
-          {/* Social buttons */}
           <View style={styles.socialArea}>
             <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8}>
               <GoogleIcon size={20} />
-              <Text style={styles.socialBtnText}>Google ile devam et</Text>
+              <Text style={styles.socialBtnText}>{t('auth.continueWithGoogle')}</Text>
             </TouchableOpacity>
 
             {Platform.OS === 'ios' && (
               <TouchableOpacity style={[styles.socialBtn, styles.appleBtnStyle]} activeOpacity={0.8}>
                 <AppleIcon size={20} color="#fff" />
-                <Text style={[styles.socialBtnText, { color: '#fff' }]}>Apple ile devam et</Text>
+                <Text style={[styles.socialBtnText, { color: '#fff' }]}>{t('auth.continueWithApple')}</Text>
               </TouchableOpacity>
             )}
           </View>
 
-          {/* Register link */}
           <View style={styles.registerRow}>
-            <Text style={styles.registerText}>Hesabın yok mu? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.registerLink}>Hesap Oluştur</Text>
+            <Text style={styles.registerText}>{t('auth.noAccount')} </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Assessment')}>
+              <Text style={styles.registerLink}>{t('auth.signUp')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

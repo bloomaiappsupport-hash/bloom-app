@@ -2,6 +2,8 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Polygon, Circle, Line, Text as SvgText } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
+import * as Localization from 'expo-localization';
 import { typography, spacing, radius } from '../../theme';
 import { useColors } from '../../hooks/useColors';
 import { useHabitStore } from '../../stores/habitStore';
@@ -13,22 +15,11 @@ import { HabitCategory } from '../../types';
 
 const { width } = Dimensions.get('window');
 
-const CATEGORY_LABELS: Record<HabitCategory, string> = {
-  fitness: 'Fitness',
-  mind: 'Zihin',
-  sleep: 'Uyku',
-  nutrition: 'Beslenme',
-  social: 'Sosyal',
-  work: 'Kariyer',
-  custom: 'Özel',
-};
-
 const RADAR_CATEGORIES: HabitCategory[] = ['fitness', 'mind', 'sleep', 'nutrition', 'social', 'work'];
-
-const DAYS_TR = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
 
 function RadarChart({ scores }: { scores: Record<string, number> }) {
   const colors = useColors();
+  const { t } = useTranslation();
   const size = width - spacing.base * 4;
   const cx = size / 2;
   const cy = size / 2;
@@ -79,7 +70,7 @@ function RadarChart({ scores }: { scores: Record<string, number> }) {
         const ly = cy + (r + 24) * Math.sin(angle(i));
         return (
           <SvgText key={i} x={lx} y={ly + 4} textAnchor="middle" fill={colors.textSecondary} fontSize="11" fontWeight="600">
-            {CATEGORY_LABELS[cat]}
+            {t(`insights.categories.${cat}`)}
           </SvgText>
         );
       })}
@@ -102,6 +93,9 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
 function WeekHeatmap({ countsByDate }: { countsByDate: Record<string, number> }) {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { t } = useTranslation();
+
+  const DAY_KEYS = ['daySun', 'dayMon', 'dayTue', 'dayWed', 'dayThu', 'dayFri', 'daySat'];
 
   const week = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
@@ -109,7 +103,7 @@ function WeekHeatmap({ countsByDate }: { countsByDate: Record<string, number> })
     const dateKey = d.toISOString().split('T')[0];
     const isToday = i === 6;
     return {
-      label: DAYS_TR[d.getDay()],
+      label: t(`insights.${DAY_KEYS[d.getDay()]}`),
       count: countsByDate[dateKey] ?? 0,
       isToday,
     };
@@ -143,6 +137,7 @@ function WeekHeatmap({ countsByDate }: { countsByDate: Record<string, number> })
 export default function InsightsScreen() {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { t } = useTranslation();
   const { habits, streaks, todayCompletions } = useHabitStore();
 
   const categoryColors = useMemo((): Record<HabitCategory, string> => ({
@@ -155,20 +150,18 @@ export default function InsightsScreen() {
     custom: colors.primary,
   }), [colors]);
 
-  const categoryScores = useMemo(() => {
-    const scores: Record<string, number> = {};
-    RADAR_CATEGORIES.forEach((cat) => {
-      const catHabits = habits.filter((h) => h.category === cat);
-      if (catHabits.length === 0) { scores[cat] = 0; return; }
-      const avgStreak = catHabits.reduce((sum, h) => sum + (streaks[h.id]?.current_streak ?? 0), 0) / catHabits.length;
-      scores[cat] = Math.min(100, avgStreak * 10);
-    });
-    return scores;
-  }, [habits, streaks]);
-
   const { user } = useAuthStore();
   const [countsByDate, setCountsByDate] = useState<Record<string, number>>({});
   const [longestStreakDB, setLongestStreakDB] = useState(0);
+  const [catDaysHistory, setCatDaysHistory] = useState<Record<string, number>>({});
+
+  const categoryScores = useMemo(() => {
+    const scores: Record<string, number> = {};
+    RADAR_CATEGORIES.forEach((cat) => {
+      scores[cat] = Math.min(100, Math.round(((catDaysHistory[cat] ?? 0) / 30) * 100));
+    });
+    return scores;
+  }, [catDaysHistory]);
 
   const longestStreakMem = Object.values(streaks).reduce((max, s) => {
     const val = Number(s.longest_streak);
@@ -181,7 +174,6 @@ export default function InsightsScreen() {
     if (!user?.id) return;
     const userId = user.id;
 
-    // Haftalık tamamlamalar
     habitsService.getCompletionHistory(userId, 7).then(({ data }) => {
       if (!data) return;
       const map: Record<string, number> = {};
@@ -192,18 +184,40 @@ export default function InsightsScreen() {
       setCountsByDate(map);
     });
 
-    // En uzun seri — doğrudan Supabase'den
+    habitsService.getCompletionHistory(userId, 30).then(({ data }) => {
+      if (!data) return;
+      const seenDayCat = new Set<string>();
+      const counts: Record<string, number> = {};
+      data.forEach((c) => {
+        const cat = c.category ?? habits.find((h) => h.id === c.habit_id)?.category;
+        if (!cat) return;
+        const key = `${c.completed_at.split('T')[0]}:${cat}`;
+        if (!seenDayCat.has(key)) {
+          seenDayCat.add(key);
+          counts[cat] = (counts[cat] ?? 0) + 1;
+        }
+      });
+      setCatDaysHistory(counts);
+    });
+
     habitsService.getAllStreaks(userId).then(({ data, error }) => {
       if (error) { console.error('[getAllStreaks error]', error.message); return; }
       if (!data || data.length === 0) { console.log('[getAllStreaks] no rows'); return; }
-      console.log('[getAllStreaks]', JSON.stringify(data));
       const max = data.reduce((m, s) => {
         const val = Number(s.longest_streak);
         return Math.max(m, isNaN(val) ? 0 : val);
       }, 0);
       setLongestStreakDB(max);
     });
-  }, [user?.id]);
+  }, [user?.id, habits]);
+
+  const isTurkishUser = (() => {
+    const locale = Localization.getLocales()[0];
+    const region = locale?.regionCode?.toUpperCase();
+    const lang = locale?.languageCode?.toLowerCase();
+    const timezone = locale?.timezone ?? '';
+    return region === 'TR' || lang === 'tr' || timezone.includes('Istanbul');
+  })();
 
   const [weeklyInsight, setWeeklyInsight] = useState('');
   const [loadingInsight, setLoadingInsight] = useState(false);
@@ -213,7 +227,9 @@ export default function InsightsScreen() {
     if (loadingInsight || weeklyInsight) return;
     setLoadingInsight(true);
     setInsightError('');
-    const { data, error } = await supabase.functions.invoke('weekly-insights', {});
+    const { data, error } = await supabase.functions.invoke('weekly-insights', {
+      body: { language: isTurkishUser ? 'tr' : 'en' },
+    });
     if (error) {
       setInsightError(error.message);
     } else if (data?.insight) {
@@ -227,44 +243,44 @@ export default function InsightsScreen() {
   return (
     <ScreenContainer scrollable>
       <View style={styles.header}>
-        <Text style={styles.pageTitle}>İçgörüler</Text>
-        <Text style={styles.pageSubtitle}>Alışkanlık DNA & İstatistikler</Text>
+        <Text style={styles.pageTitle}>{t('insights.title')}</Text>
+        <Text style={styles.pageSubtitle}>{t('insights.subtitle')}</Text>
       </View>
 
       <View style={styles.statsRow}>
-        <StatCard label="En Uzun Seri" value={`${longestStreak}`} sub="gün" />
-        <StatCard label="Bugün" value={`${completionRate}%`} sub="tamamlandı" />
-        <StatCard label="Alışkanlık" value={`${habits.length}`} sub="aktif" />
+        <StatCard label={t('insights.longestStreak')} value={`${longestStreak}`} sub={t('insights.days')} />
+        <StatCard label={t('insights.todayStat')} value={`${completionRate}%`} sub={t('insights.completedSub')} />
+        <StatCard label={t('insights.habitsStat')} value={`${habits.length}`} sub={t('insights.activeSub')} />
       </View>
 
       <GlassCard style={styles.dnaCard}>
         <View style={styles.dnaTitleRow}>
-          <Text style={styles.dnaTitle}>Alışkanlık DNA</Text>
+          <Text style={styles.dnaTitle}>{t('insights.dnaTitle')}</Text>
           <View style={styles.dnaBadge}>
             <LinearGradient colors={[colors.primary + '33', colors.primaryDim + '22']} style={StyleSheet.absoluteFill} />
-            <Text style={styles.dnaBadgeText}>Kişisel</Text>
+            <Text style={styles.dnaBadgeText}>{t('insights.personal')}</Text>
           </View>
         </View>
-        <Text style={styles.dnaSubtitle}>Alışkanlık kategorilerine göre güç haritanı</Text>
+        <Text style={styles.dnaSubtitle}>{t('insights.dnaSubtitle')}</Text>
         <View style={styles.radarWrapper}>
           <RadarChart scores={categoryScores} />
         </View>
       </GlassCard>
 
       <GlassCard style={styles.weekCard}>
-        <Text style={styles.sectionTitle}>Bu Hafta</Text>
+        <Text style={styles.sectionTitle}>{t('insights.thisWeek')}</Text>
         <WeekHeatmap countsByDate={countsByDate} />
       </GlassCard>
 
       <GlassCard style={styles.insightCard}>
         <View style={styles.insightHeader}>
-          <Text style={styles.sectionTitle}>Haftalık AI Raporu</Text>
+          <Text style={styles.sectionTitle}>{t('insights.weeklyAiReport')}</Text>
           {!weeklyInsight && (
             <TouchableOpacity onPress={fetchWeeklyInsight} disabled={loadingInsight}
               style={[styles.insightBtn, { opacity: loadingInsight ? 0.6 : 1 }]}>
               {loadingInsight
                 ? <ActivityIndicator size="small" color={colors.primary} />
-                : <Text style={styles.insightBtnText}>Oluştur</Text>}
+                : <Text style={styles.insightBtnText}>{t('insights.generate')}</Text>}
             </TouchableOpacity>
           )}
         </View>
@@ -274,13 +290,13 @@ export default function InsightsScreen() {
           ? <Text style={[styles.insightPlaceholder, { color: colors.error }]}>{insightError}</Text>
           : !loadingInsight && (
             <Text style={styles.insightPlaceholder}>
-              Bu haftanın alışkanlık verilerini analiz ederek kişisel bir rapor oluştur.
+              {t('insights.weeklyPlaceholder')}
             </Text>
           )}
       </GlassCard>
 
       <View style={styles.breakdownSection}>
-        <Text style={styles.sectionTitle}>Kategori Dağılımı</Text>
+        <Text style={styles.sectionTitle}>{t('insights.categoryBreakdown')}</Text>
         {RADAR_CATEGORIES.map((cat) => {
           const score = categoryScores[cat] ?? 0;
           const color = categoryColors[cat];
@@ -289,7 +305,7 @@ export default function InsightsScreen() {
             <View key={cat} style={styles.breakdownRow}>
               <View style={styles.breakdownLeft}>
                 <View style={[styles.breakdownDot, { backgroundColor: color }]} />
-                <Text style={styles.breakdownLabel} numberOfLines={1}>{CATEGORY_LABELS[cat]}</Text>
+                <Text style={styles.breakdownLabel} numberOfLines={1}>{t(`insights.categories.${cat}`)}</Text>
               </View>
               <View style={styles.breakdownBarTrack}>
                 <View style={[styles.breakdownBarFill, { width: `${score}%`, backgroundColor: color }]} />
@@ -311,9 +327,9 @@ function createStyles(colors: ReturnType<typeof useColors>) {
 
     statsRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl },
     statCard: { flex: 1, padding: spacing.md, alignItems: 'center', gap: 4 },
-    statValue: { ...typography.h2, color: colors.textPrimary },
+    statValue: { ...typography.h2, color: colors.textPrimary, textAlign: 'center' },
     statLabel: { ...typography.caption, color: colors.textSecondary, textAlign: 'center' },
-    statSub: { ...typography.caption, color: colors.textMuted },
+    statSub: { ...typography.caption, color: colors.textMuted, textAlign: 'center' },
 
     dnaCard: { marginBottom: spacing.xl, padding: spacing.base },
     dnaTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xs },

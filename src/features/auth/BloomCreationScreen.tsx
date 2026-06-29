@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../../navigation/types';
 import { colors, typography, spacing } from '../../theme';
 import BloomLogo from '../../components/common/BloomLogo';
@@ -10,17 +11,18 @@ import BloomLogo from '../../components/common/BloomLogo';
 const { width } = Dimensions.get('window');
 type Nav = StackNavigationProp<RootStackParamList, 'BloomCreation'>;
 
-const STEPS = [
-  'Profil analiz ediliyor...',
-  "Alışkanlık DNA'n oluşturuluyor...",
-  'AI koçun hazırlanıyor...',
-  "Bloom'un şekilleniyor...",
-  'Hazır!',
-];
-
 export default function BloomCreationScreen() {
   const navigation = useNavigation<Nav>();
+  const { t } = useTranslation();
   const [stepIndex, setStepIndex] = useState(0);
+
+  const STEPS = [
+    t('creation.step1'),
+    t('creation.step2'),
+    t('creation.step3'),
+    t('creation.step4'),
+    t('creation.step5'),
+  ];
 
   const logoScale   = useRef(new Animated.Value(0.5)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
@@ -60,7 +62,7 @@ export default function BloomCreationScreen() {
         }).start();
       } else {
         clearInterval(interval);
-        setTimeout(() => (navigation as any).replace('Auth', { screen: 'Login' }), 500);
+        setTimeout(() => (navigation as any).replace('Auth', { screen: 'Register' }), 500);
       }
     }, 900);
 
@@ -79,7 +81,7 @@ export default function BloomCreationScreen() {
 
       {/* Top label */}
       <View style={styles.topLabel}>
-        <Text style={styles.topLabelText}>BLOOM OLUŞTURULUYOR</Text>
+        <Text style={styles.topLabelText}>{t('creation.topLabel')}</Text>
       </View>
 
       {/* Center: logo + pulse glow */}

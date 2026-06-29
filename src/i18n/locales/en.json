@@ -13,40 +13,77 @@
     "error": "Something went wrong",
     "retry": "Retry",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "or": "or"
+  },
+  "nav": {
+    "home": "Home",
+    "habits": "Habits",
+    "coach": "Coach",
+    "insights": "Insights",
+    "profile": "Profile"
   },
   "auth": {
     "welcome": "Welcome back",
     "signIn": "Sign In",
     "signUp": "Create Account",
+    "signUpSubtitle": "Start building your Bloom",
     "email": "Email",
+    "emailPlaceholder": "example@mail.com",
     "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "passwordMinHint": "At least 8 characters",
+    "name": "Name",
+    "namePlaceholder": "Your name",
     "forgotPassword": "Forgot Password",
     "continueWithGoogle": "Continue with Google",
     "continueWithApple": "Continue with Apple",
     "noAccount": "Don't have an account?",
-    "hasAccount": "Already have an account?"
+    "hasAccount": "Already have an account?",
+    "loginFailed": "Login Failed",
+    "termsText": "Terms of Service",
+    "privacyText": "Privacy Policy",
+    "termsPrefix": " and ",
+    "termsAccept": "I have read and agree",
+    "forgotTitle": "Reset Your Password",
+    "forgotSubtitle": "Enter your email and we'll send a reset link.",
+    "sendLink": "Send Link",
+    "backBtn": "← Back",
+    "sentTitle": "Sent!",
+    "sentMessage": "We sent a reset link to {{email}}. Check your inbox.",
+    "backToLogin": "Back to Login"
+  },
+  "password": {
+    "veryWeak": "Very weak",
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong",
+    "veryStrong": "Very strong",
+    "req_length": "At least 8 characters",
+    "req_upper": "Uppercase letter (A-Z)",
+    "req_number": "Number (0-9)",
+    "req_special": "Special character (!@#...)"
   },
   "onboarding": {
     "step1": {
-      "title": "Build Your Bloom",
-      "subtitle": "Your habits shape your energy. Grow stronger every day with BLOOM."
+      "title": "Your Habits\nAre Blooming",
+      "subtitle": "Every small step helps you grow. With BLOOM, turn your habits into a lifestyle."
     },
     "step2": {
-      "title": "Your AI Coach Knows You",
-      "subtitle": "Not just tracking — real coaching. Your barriers, motivation, patterns."
+      "title": "A Coach That\nKnows You",
+      "subtitle": "Not just tracking — real coaching. Your barriers, patterns and motivation are analyzed."
     },
     "step3": {
-      "title": "Create Ritual Stacks",
-      "subtitle": "Chain habits into a whole. Let your morning ritual set the tone for the day."
+      "title": "Create\nRitual Stacks",
+      "subtitle": "Chain habits together. Feel how your morning ritual sets the tone for the day."
     },
     "step4": {
-      "title": "Discover Your Habit DNA",
-      "subtitle": "Your personal habit profile. Strengths and growth areas become visible."
+      "title": "Discover Your\nHabit DNA",
+      "subtitle": "Your unique habit profile. Strengths and areas for growth become visible."
     },
     "step5": {
-      "title": "Ready?",
-      "subtitle": "8 quick questions and we build a custom start tailored to your aura."
+      "title": "Are You\nReady?",
+      "subtitle": "8 quick questions and we'll create a personalized start for you. Just 60 seconds."
     }
   },
   "assessment": {
@@ -67,18 +104,72 @@
     "greeting_evening": "Good evening",
     "greeting_night": "Good night",
     "todayProgress": "Today's Progress",
+    "today": "Today",
+    "completed": "Completed",
+    "remaining": "Remaining",
+    "total": "Total",
+    "habitCount": "{{completed}} / {{total}} habits",
     "streakDays": "{{count}} day streak",
     "moodCheckIn": "How are you feeling today?",
+    "moodBad": "Bad",
+    "moodOkay": "Okay",
+    "moodGood": "Good",
+    "moodGreat": "Great",
+    "moodAmazing": "Amazing",
+    "todayHabits": "Today's Habits",
     "noHabitsToday": "No habits for today",
+    "noHabitsHint": "Add habits from the Habits tab",
     "addFirstHabit": "Add your first habit",
-    "completedAll": "You completed everything! Amazing."
+    "completedAll": "You completed everything! Amazing.",
+    "allDoneTitle": "Perfect day!",
+    "allDoneMessage": "You completed all {{count}} habits today.",
+    "notifications": "Notifications",
+    "noAlerts": "No pending alerts",
+    "alertsHint": "Streaks and completions will appear here.",
+    "milestoneStreak": "{{count}} day streak!",
+    "milestoneMsg": "An amazing milestone for your {{title}} habit.",
+    "atRiskEvening": "Don't forget to complete it tonight.",
+    "atRiskDay": "You haven't completed it yet today.",
+    "atRiskNight": "Your {{count}} day streak is about to break!"
   },
   "habits": {
     "title": "Habits",
     "add": "Add Habit",
+    "addBtn": "+ Add",
     "edit": "Edit Habit",
     "delete": "Delete Habit",
     "deleteConfirm": "Are you sure you want to delete this habit?",
+    "deleteTitle": "Delete Habit",
+    "deleteMsg": "Delete \"{{title}}\"?",
+    "newHabit": "New Habit",
+    "namePlaceholder": "Habit name...",
+    "labelCategory": "Category",
+    "labelIcon": "Icon",
+    "labelFrequency": "Frequency",
+    "labelReminder": "Reminder",
+    "noHabits": "No habits yet",
+    "firstHabitSubtitle": "Start building your bloom by adding your first habit.",
+    "addFirst": "Add Your First Habit",
+    "error": "Error",
+    "streakLabel": "Streak",
+    "bestLabel": "Best",
+    "shieldLabel": "Shield",
+    "shieldTitle": "🛡️ Use Shield",
+    "shieldMessage": "Use a shield to protect today's {{title}} streak. Remaining: {{shields}} shields",
+    "useShield": "🛡️ Use Shield ({{count}})",
+    "rutin": "Routine",
+    "stacks": "Ritual Stacks",
+    "createStack": "+ Create",
+    "stackEmpty": "Chain your habits to create a morning or evening routine.",
+    "stackNoHabits": "No habits added",
+    "newStack": "New Ritual Stack",
+    "stackNamePlaceholder": "Routine name (e.g. Morning Ritual)...",
+    "stackTimeLabel": "Time",
+    "stackHabitsLabel": "Habits",
+    "timeMorning": "Morning",
+    "timeAfternoon": "Afternoon",
+    "timeEvening": "Evening",
+    "timeNight": "Night",
     "category": {
       "fitness": "Fitness",
       "mind": "Mind",
@@ -91,7 +182,9 @@
     "frequency": {
       "daily": "Every day",
       "weekly": "Weekly",
-      "custom": "Custom"
+      "custom": "Custom",
+      "dailyBtn": "Every Day",
+      "weeklyBtn": "Weekly"
     },
     "streak": "day streak",
     "swipeToComplete": "Swipe to complete"
@@ -102,6 +195,21 @@
     "thinking": "Thinking...",
     "limitReached": "You've reached your daily message limit",
     "upgradeForMore": "Go Premium for unlimited coaching",
+    "messagesLeft": "{{count}} messages left",
+    "premiumUnlimited": "Premium — Unlimited",
+    "dailyLimitTitle": "Daily limit reached",
+    "dailyLimitText": "Go Premium for unlimited AI coaching.",
+    "connectionError": "Connection error. Check your internet.",
+    "errorReply": "An error occurred, please try again.",
+    "greeting": "Hello{{name}}! I'm BLOOM's AI coach. What would you like to talk about — your habits, goals, or daily routine?",
+    "quickAnalyzeLabel": "Analyze",
+    "quickBarrierLabel": "Barrier",
+    "quickSuggestLabel": "Suggest",
+    "quickMotivateLabel": "Motivate",
+    "quickAnalyzeText": "Analyze my habits",
+    "quickBarrierText": "How do I overcome barriers?",
+    "quickSuggestText": "Suggest a new habit",
+    "quickMotivateText": "Motivate me",
     "suggestions": {
       "analyze": "Analyze my habits",
       "barrier": "Help me overcome barriers",
@@ -111,23 +219,105 @@
   },
   "insights": {
     "title": "Insights",
+    "subtitle": "Habit DNA & Statistics",
     "habitDna": "Habit DNA",
     "weeklyReport": "Weekly Report",
     "streak": "Streak",
     "completionRate": "Completion Rate",
     "bestDay": "Best Day",
     "moodAvg": "Average Mood",
-    "noInsights": "Not enough data yet. Check back in a few days."
+    "noInsights": "Not enough data yet. Check back in a few days.",
+    "longestStreak": "Longest Streak",
+    "todayStat": "Today",
+    "habitsStat": "Habits",
+    "days": "days",
+    "completedSub": "completed",
+    "activeSub": "active",
+    "dnaTitle": "Habit DNA",
+    "personal": "Personal",
+    "dnaSubtitle": "Your strength map by habit categories",
+    "thisWeek": "This Week",
+    "weeklyAiReport": "Weekly AI Report",
+    "generate": "Generate",
+    "weeklyPlaceholder": "Analyze this week's habit data and create a personal report.",
+    "categoryBreakdown": "Category Breakdown",
+    "daySun": "Sun",
+    "dayMon": "Mon",
+    "dayTue": "Tue",
+    "dayWed": "Wed",
+    "dayThu": "Thu",
+    "dayFri": "Fri",
+    "daySat": "Sat",
+    "categories": {
+      "fitness": "Fitness",
+      "mind": "Mind",
+      "sleep": "Sleep",
+      "nutrition": "Nutrition",
+      "social": "Social",
+      "work": "Career",
+      "custom": "Custom"
+    }
   },
   "profile": {
     "title": "Profile",
     "premium": "Premium",
     "upgradeToPremium": "Go Premium",
+    "goPremium": "Go Premium",
     "settings": "Settings",
     "notifications": "Notifications",
     "language": "Language",
+    "languageTurkish": "Türkçe",
+    "languageEnglish": "English",
     "signOut": "Sign Out",
-    "version": "Version {{version}}"
+    "version": "BLOOM v{{version}}",
+    "sectionPreferences": "PREFERENCES",
+    "sectionAccount": "ACCOUNT",
+    "changePassword": "Change Password",
+    "deleteAccount": "Delete Account",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "habitsCount": "Habits",
+    "bloomLevel": "Bloom Level",
+    "daySeries": "Day Streak",
+    "freePlan": "Free Plan",
+    "premiumSub": "Unlimited AI coaching, streak shields and detailed Habit DNA",
+    "passwordModal": {
+      "title": "Change Password",
+      "newPassword": "New password",
+      "confirm": "Confirm password",
+      "minLength": "Password must be at least 6 characters.",
+      "mismatch": "Passwords do not match.",
+      "updated": "Password updated!"
+    },
+    "signOutModal": {
+      "title": "Sign Out",
+      "message": "Are you sure you want to sign out?",
+      "confirm": "Sign Out"
+    },
+    "deleteModal": {
+      "title": "Delete Account",
+      "message": "Your account and all data will be permanently deleted. This cannot be undone.",
+      "confirm": "Delete"
+    },
+    "notifPermission": {
+      "title": "Permission Required",
+      "message": "To enable notifications, go to Settings > Bloom > Notifications.",
+      "confirm": "OK"
+    },
+    "notifOnboarding": {
+      "title": "Enable Notifications",
+      "message": "BLOOM would like to send you notifications to remind you of your habits and alert you when your streaks are at risk.",
+      "allow": "Allow",
+      "skip": "Not Now"
+    }
+  },
+  "creation": {
+    "topLabel": "CREATING YOUR BLOOM",
+    "step1": "Analyzing your profile...",
+    "step2": "Building your Habit DNA...",
+    "step3": "Preparing your AI coach...",
+    "step4": "Shaping your Bloom...",
+    "step5": "Ready!"
   },
   "premium": {
     "title": "BLOOM Premium",

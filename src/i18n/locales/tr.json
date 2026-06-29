@@ -13,40 +13,77 @@
     "error": "Bir hata oluştu",
     "retry": "Tekrar Dene",
     "yes": "Evet",
-    "no": "Hayır"
+    "no": "Hayır",
+    "or": "veya"
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "habits": "Alışkanlıklar",
+    "coach": "Koç",
+    "insights": "İçgörüler",
+    "profile": "Profil"
   },
   "auth": {
     "welcome": "Tekrar hoş geldin",
     "signIn": "Giriş Yap",
     "signUp": "Hesap Oluştur",
+    "signUpSubtitle": "Bloom'u inşa etmeye başla",
     "email": "E-posta",
+    "emailPlaceholder": "ornek@mail.com",
     "password": "Şifre",
+    "passwordPlaceholder": "••••••••",
+    "passwordMinHint": "En az 8 karakter",
+    "name": "İsim",
+    "namePlaceholder": "Adın",
     "forgotPassword": "Şifremi Unuttum",
-    "continueWithGoogle": "Google ile Devam Et",
-    "continueWithApple": "Apple ile Devam Et",
+    "continueWithGoogle": "Google ile devam et",
+    "continueWithApple": "Apple ile devam et",
     "noAccount": "Hesabın yok mu?",
-    "hasAccount": "Zaten hesabın var mı?"
+    "hasAccount": "Zaten hesabın var mı?",
+    "loginFailed": "Giriş Başarısız",
+    "termsText": "Kullanım Koşulları",
+    "privacyText": "Gizlilik Politikasını",
+    "termsPrefix": " ve ",
+    "termsAccept": "okudum, kabul ediyorum",
+    "forgotTitle": "Şifreni Sıfırla",
+    "forgotSubtitle": "E-posta adresini gir, sıfırlama bağlantısı gönderelim.",
+    "sendLink": "Bağlantı Gönder",
+    "backBtn": "← Geri",
+    "sentTitle": "Gönderildi!",
+    "sentMessage": "{{email}} adresine sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
+    "backToLogin": "Giriş Ekranına Dön"
+  },
+  "password": {
+    "veryWeak": "Çok zayıf",
+    "weak": "Zayıf",
+    "medium": "Orta",
+    "strong": "Güçlü",
+    "veryStrong": "Çok güçlü",
+    "req_length": "En az 8 karakter",
+    "req_upper": "Büyük harf (A-Z)",
+    "req_number": "Rakam (0-9)",
+    "req_special": "Özel karakter (!@#...)"
   },
   "onboarding": {
     "step1": {
-      "title": "Bloomnı İnşa Et",
-      "subtitle": "Alışkanlıkların, enerjini şekillendirir. BLOOM ile her gün biraz daha güçlen."
+      "title": "Alışkanlıkların\nÇiçekleniyor",
+      "subtitle": "Her küçük adım seni büyütür. BLOOM ile alışkanlıklarını bir yaşam tarzına dönüştür."
     },
     "step2": {
-      "title": "AI Koçun Seni Tanır",
-      "subtitle": "Sadece takip değil — gerçek koçluk. Engellerin, motivasyonun, örüntülerin."
+      "title": "Seni Tanıyan\nBir Koç",
+      "subtitle": "Sadece takip değil — gerçek koçluk. Engellerin, örüntülerin ve motivasyonun analiz edilir."
     },
     "step3": {
-      "title": "Ritual Stack'ler Yarat",
-      "subtitle": "Alışkanlıkları zincirleriyle bir bütün haline getir. Sabah ritüelin bir gün gibi başlasın."
+      "title": "Ritual Stack'ler\nYarat",
+      "subtitle": "Alışkanlıkları birbirine zincirle. Sabah ritüelin günü nasıl başlattığını hissedeceksin."
     },
     "step4": {
-      "title": "Habit DNA'nı Keşfet",
-      "subtitle": "Kişisel alışkanlık profilin. Güçlü yönlerin, gelişim alanların görünür hale geliyor."
+      "title": "Habit DNA'nı\nKeşfet",
+      "subtitle": "Benzersiz alışkanlık profilin. Güçlü ve gelişime açık yönlerin görünür hale gelir."
     },
     "step5": {
-      "title": "Hazır mısın?",
-      "subtitle": "8 hızlı soru ile aurana özel bir başlangıç hazırlıyoruz."
+      "title": "Hazır\nmısın?",
+      "subtitle": "8 hızlı soruyla sana özel bir başlangıç hazırlıyoruz. Sadece 60 saniye sürer."
     }
   },
   "assessment": {
@@ -67,18 +104,72 @@
     "greeting_evening": "İyi akşamlar",
     "greeting_night": "İyi geceler",
     "todayProgress": "Bugünkü İlerleme",
+    "today": "Bugün",
+    "completed": "Tamamlandı",
+    "remaining": "Kalan",
+    "total": "Toplam",
+    "habitCount": "{{completed}} / {{total}} alışkanlık",
     "streakDays": "{{count}} günlük seri",
     "moodCheckIn": "Bugün nasıl hissediyorsun?",
+    "moodBad": "Kötü",
+    "moodOkay": "Orta",
+    "moodGood": "İyi",
+    "moodGreat": "Güzel",
+    "moodAmazing": "Harika",
+    "todayHabits": "Bugünkü Alışkanlıklar",
     "noHabitsToday": "Bugün için alışkanlık yok",
+    "noHabitsHint": "Alışkanlıklar sekmesinden ekleyebilirsin",
     "addFirstHabit": "İlk alışkanlığını ekle",
-    "completedAll": "Hepsini tamamladın! Muhteşem."
+    "completedAll": "Hepsini tamamladın! Muhteşem.",
+    "allDoneTitle": "Mükemmel gün!",
+    "allDoneMessage": "Bugün tüm {{count}} alışkanlığını tamamladın.",
+    "notifications": "Bildirimler",
+    "noAlerts": "Bekleyen uyarı yok",
+    "alertsHint": "Seriler ve tamamlamalar burada görünür.",
+    "milestoneStreak": "{{count}} gün serisi!",
+    "milestoneMsg": "{{title}} alışkanlığında harika bir dönüm noktası.",
+    "atRiskEvening": "Akşam tamamlamayı unutma.",
+    "atRiskDay": "Bugün henüz tamamlamadın.",
+    "atRiskNight": "{{count}} günlük serin kırılmak üzere!"
   },
   "habits": {
     "title": "Alışkanlıklar",
     "add": "Alışkanlık Ekle",
+    "addBtn": "+ Ekle",
     "edit": "Alışkanlığı Düzenle",
     "delete": "Alışkanlığı Sil",
     "deleteConfirm": "Bu alışkanlığı silmek istediğine emin misin?",
+    "deleteTitle": "Alışkanlığı Sil",
+    "deleteMsg": "\"{{title}}\" silinsin mi?",
+    "newHabit": "Yeni Alışkanlık",
+    "namePlaceholder": "Alışkanlık adı...",
+    "labelCategory": "Kategori",
+    "labelIcon": "İkon",
+    "labelFrequency": "Sıklık",
+    "labelReminder": "Hatırlatıcı",
+    "noHabits": "Henüz alışkanlık yok",
+    "firstHabitSubtitle": "İlk alışkanlığını ekleyerek bloom'unu inşa etmeye başla.",
+    "addFirst": "İlk Alışkanlığını Ekle",
+    "error": "Hata",
+    "streakLabel": "Seri",
+    "bestLabel": "En İyi",
+    "shieldLabel": "Kalkan",
+    "shieldTitle": "🛡️ Kalkan Kullan",
+    "shieldMessage": "Bir kalkan harcayarak bugünkü {{title}} serisini koru. Kalan: {{shields}} kalkan",
+    "useShield": "🛡️ Kalkan Kullan ({{count}})",
+    "rutin": "Rutin",
+    "stacks": "Rutin Stack'ler",
+    "createStack": "+ Oluştur",
+    "stackEmpty": "Alışkanlıklarını zincirle bir sabah veya akşam rutini oluştur.",
+    "stackNoHabits": "Alışkanlık eklenmemiş",
+    "newStack": "Yeni Rutin Stack",
+    "stackNamePlaceholder": "Rutin adı (ör. Sabah Ritüeli)...",
+    "stackTimeLabel": "Zaman",
+    "stackHabitsLabel": "Alışkanlıklar",
+    "timeMorning": "Sabah",
+    "timeAfternoon": "Öğlen",
+    "timeEvening": "Akşam",
+    "timeNight": "Gece",
     "category": {
       "fitness": "Fitness",
       "mind": "Zihin",
@@ -91,7 +182,9 @@
     "frequency": {
       "daily": "Her gün",
       "weekly": "Haftalık",
-      "custom": "Özel"
+      "custom": "Özel",
+      "dailyBtn": "Her Gün",
+      "weeklyBtn": "Haftalık"
     },
     "streak": "gün serisi",
     "swipeToComplete": "Tamamlamak için kaydır"
@@ -102,6 +195,21 @@
     "thinking": "Düşünüyor...",
     "limitReached": "Günlük mesaj limitine ulaştın",
     "upgradeForMore": "Sınırsız konuşma için Premium'a geç",
+    "messagesLeft": "{{count}} mesaj kaldı",
+    "premiumUnlimited": "Premium — Sınırsız",
+    "dailyLimitTitle": "Günlük limit doldu",
+    "dailyLimitText": "Sınırsız AI koçluk için Premium'a geç.",
+    "connectionError": "Bağlantı hatası. İnternet bağlantını kontrol et.",
+    "errorReply": "Bir hata oluştu, tekrar dene.",
+    "greeting": "Merhaba{{name}}! Ben BLOOM'un AI koçuyum. Alışkanlıkların, hedeflerin veya günlük rutinin hakkında ne konuşmak istersin?",
+    "quickAnalyzeLabel": "Analiz",
+    "quickBarrierLabel": "Engel",
+    "quickSuggestLabel": "Öneri",
+    "quickMotivateLabel": "Motive",
+    "quickAnalyzeText": "Alışkanlıklarımı analiz et",
+    "quickBarrierText": "Engellerin üstesinden nasıl gelirim?",
+    "quickSuggestText": "Yeni alışkanlık öner",
+    "quickMotivateText": "Beni motive et",
     "suggestions": {
       "analyze": "Alışkanlıklarımı analiz et",
       "barrier": "Engellerin üstesinden gelmeye yardım et",
@@ -111,23 +219,105 @@
   },
   "insights": {
     "title": "İçgörüler",
+    "subtitle": "Alışkanlık DNA & İstatistikler",
     "habitDna": "Habit DNA",
     "weeklyReport": "Haftalık Rapor",
     "streak": "Seri",
     "completionRate": "Tamamlama Oranı",
     "bestDay": "En İyi Gün",
     "moodAvg": "Ortalama Ruh Hali",
-    "noInsights": "Henüz yeterli veri yok. Birkaç gün sonra görüntüle."
+    "noInsights": "Henüz yeterli veri yok. Birkaç gün sonra görüntüle.",
+    "longestStreak": "En Uzun Seri",
+    "todayStat": "Bugün",
+    "habitsStat": "Alışkanlık",
+    "days": "gün",
+    "completedSub": "tamamlandı",
+    "activeSub": "aktif",
+    "dnaTitle": "Alışkanlık DNA",
+    "personal": "Kişisel",
+    "dnaSubtitle": "Alışkanlık kategorilerine göre güç haritanı",
+    "thisWeek": "Bu Hafta",
+    "weeklyAiReport": "Haftalık AI Raporu",
+    "generate": "Oluştur",
+    "weeklyPlaceholder": "Bu haftanın alışkanlık verilerini analiz ederek kişisel bir rapor oluştur.",
+    "categoryBreakdown": "Kategori Dağılımı",
+    "daySun": "Paz",
+    "dayMon": "Pzt",
+    "dayTue": "Sal",
+    "dayWed": "Çar",
+    "dayThu": "Per",
+    "dayFri": "Cum",
+    "daySat": "Cmt",
+    "categories": {
+      "fitness": "Fitness",
+      "mind": "Zihin",
+      "sleep": "Uyku",
+      "nutrition": "Beslenme",
+      "social": "Sosyal",
+      "work": "Kariyer",
+      "custom": "Özel"
+    }
   },
   "profile": {
     "title": "Profil",
     "premium": "Premium",
     "upgradeToPremium": "Premium'a Geç",
+    "goPremium": "Premium'a Geç",
     "settings": "Ayarlar",
     "notifications": "Bildirimler",
     "language": "Dil",
+    "languageTurkish": "Türkçe",
+    "languageEnglish": "English",
     "signOut": "Çıkış Yap",
-    "version": "Versiyon {{version}}"
+    "version": "BLOOM v{{version}}",
+    "sectionPreferences": "TERCİHLER",
+    "sectionAccount": "HESAP",
+    "changePassword": "Şifremi Değiştir",
+    "deleteAccount": "Hesabımı Sil",
+    "privacyPolicy": "Gizlilik Politikası",
+    "termsOfService": "Kullanım Koşulları",
+    "habitsCount": "Alışkanlık",
+    "bloomLevel": "Bloom Seviye",
+    "daySeries": "Gün Serisi",
+    "freePlan": "Ücretsiz Plan",
+    "premiumSub": "Sınırsız AI koçluk, streak kalkanları ve detaylı Habit DNA",
+    "passwordModal": {
+      "title": "Şifremi Değiştir",
+      "newPassword": "Yeni şifre",
+      "confirm": "Şifreyi onayla",
+      "minLength": "Şifre en az 6 karakter olmalı.",
+      "mismatch": "Şifreler eşleşmiyor.",
+      "updated": "Şifre güncellendi!"
+    },
+    "signOutModal": {
+      "title": "Çıkış Yap",
+      "message": "Hesabından çıkış yapmak istediğine emin misin?",
+      "confirm": "Çıkış Yap"
+    },
+    "deleteModal": {
+      "title": "Hesabımı Sil",
+      "message": "Hesabın ve tüm verilerin kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+      "confirm": "Sil"
+    },
+    "notifPermission": {
+      "title": "İzin Gerekli",
+      "message": "Bildirimleri açmak için lütfen Ayarlar > Bloom > Bildirimler yolunu izleyin.",
+      "confirm": "Tamam"
+    },
+    "notifOnboarding": {
+      "title": "Bildirimlere İzin Ver",
+      "message": "BLOOM, alışkanlıklarını hatırlatmak ve seri tehlikelerini zamanında bildirmek için bildirim göndermek istiyor.",
+      "allow": "İzin Ver",
+      "skip": "Şimdi Değil"
+    }
+  },
+  "creation": {
+    "topLabel": "BLOOM OLUŞTURULUYOR",
+    "step1": "Profil analiz ediliyor...",
+    "step2": "Alışkanlık DNA'n oluşturuluyor...",
+    "step3": "AI koçun hazırlanıyor...",
+    "step4": "Bloom'un şekilleniyor...",
+    "step5": "Hazır!"
   },
   "premium": {
     "title": "BLOOM Premium",

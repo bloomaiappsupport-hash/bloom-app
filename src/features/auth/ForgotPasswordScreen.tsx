@@ -5,12 +5,14 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { colors, typography, spacing, radius } from '../../theme';
 import { authService } from '../../services/supabase';
 import { GradientButton } from '../../components/common';
 
 export default function ForgotPasswordScreen() {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -20,7 +22,7 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
     const { error } = await authService.resetPassword(email.trim());
     setLoading(false);
-    if (error) Alert.alert('Hata', error.message);
+    if (error) Alert.alert(t('common.error'), error.message);
     else setSent(true);
   };
 
@@ -29,37 +31,33 @@ export default function ForgotPasswordScreen() {
       <LinearGradient colors={['#0D0824', colors.bg]} style={StyleSheet.absoluteFill} />
       <View style={styles.container}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>← Geri</Text>
+          <Text style={styles.backText}>{t('auth.backBtn')}</Text>
         </TouchableOpacity>
 
         {!sent ? (
           <>
-            <Text style={styles.title}>Şifreni Sıfırla</Text>
-            <Text style={styles.subtitle}>
-              E-posta adresini gir, sıfırlama bağlantısı gönderelim.
-            </Text>
+            <Text style={styles.title}>{t('auth.forgotTitle')}</Text>
+            <Text style={styles.subtitle}>{t('auth.forgotSubtitle')}</Text>
             <View style={styles.inputWrapper}>
-              <Text style={styles.inputLabel}>E-posta</Text>
+              <Text style={styles.inputLabel}>{t('auth.email')}</Text>
               <TextInput
                 style={styles.input}
                 value={email}
                 onChangeText={setEmail}
-                placeholder="ornek@mail.com"
+                placeholder={t('auth.emailPlaceholder')}
                 placeholderTextColor={colors.textMuted}
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
             </View>
-            <GradientButton label="Bağlantı Gönder" onPress={handleReset} loading={loading} style={styles.btn} />
+            <GradientButton label={t('auth.sendLink')} onPress={handleReset} loading={loading} style={styles.btn} />
           </>
         ) : (
           <View style={styles.sentArea}>
             <Text style={styles.sentIcon}>📬</Text>
-            <Text style={styles.sentTitle}>Gönderildi!</Text>
-            <Text style={styles.sentSub}>
-              {email} adresine sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.
-            </Text>
-            <GradientButton label="Giriş Ekranına Dön" onPress={() => navigation.goBack()} style={styles.btn} />
+            <Text style={styles.sentTitle}>{t('auth.sentTitle')}</Text>
+            <Text style={styles.sentSub}>{t('auth.sentMessage', { email })}</Text>
+            <GradientButton label={t('auth.backToLogin')} onPress={() => navigation.goBack()} style={styles.btn} />
           </View>
         )}
       </View>

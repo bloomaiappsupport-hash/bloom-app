@@ -21,12 +21,15 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) return json({ error: 'Unauthorized' }, 401);
 
+    // Uygulamadan gelen dil parametresi (tr veya en)
+    const body = await req.json().catch(() => ({}));
+    const language: string = body?.language === 'en' ? 'en' : 'tr';
+
     const serviceClient = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     );
 
-    // Bu haftanın başı (Pazartesi)
     const now = new Date();
     const weekStart = new Date(now);
     weekStart.setDate(now.getDate() - now.getDay() + 1);
@@ -63,14 +66,33 @@ serve(async (req) => {
     const bestStreak = streaks.reduce((max, s) => Math.max(max, s.longest_streak), 0);
     const activeStreaks = streaks.filter((s) => s.current_streak > 0).length;
 
-    const contextSummary = [
-      `Kullanıcı: ${profile?.name ?? 'Kullanıcı'}, Bloom Seviye ${profile?.bloom_level ?? 1}`,
-      `Toplam alışkanlık: ${habits.length}`,
-      `Bu hafta tamamlama oranı: %${completionRate}`,
-      `En uzun seri: ${bestStreak} gün`,
-      `Aktif seri sayısı: ${activeStreaks}`,
-      `Alışkanlık kategorileri: ${[...new Set(habits.map((h: { category: string }) => h.category))].join(', ')}`,
-    ].join('\n');
+    const isTr = language === 'tr';
+
+    const contextSummary = isTr
+      ? [
+          `Kullanıcı: ${profile?.name ?? 'Kullanıcı'}, Bloom Seviye ${profile?.bloom_level ?? 1}`,
+          `Toplam alışkanlık: ${habits.length}`,
+          `Bu hafta tamamlama oranı: %${completionRate}`,
+          `En uzun seri: ${bestStreak} gün`,
+          `Aktif seri sayısı: ${activeStreaks}`,
+          `Alışkanlık kategorileri: ${[...new Set(habits.map((h: { category: string }) => h.category))].join(', ')}`,
+        ].join('\n')
+      : [
+          `User: ${profile?.name ?? 'User'}, Bloom Level ${profile?.bloom_level ?? 1}`,
+          `Total habits: ${habits.length}`,
+          `This week completion rate: ${completionRate}%`,
+          `Longest streak: ${bestStreak} days`,
+          `Active streaks: ${activeStreaks}`,
+          `Habit categories: ${[...new Set(habits.map((h: { category: string }) => h.category))].join(', ')}`,
+        ].join('\n');
+
+    const systemPrompt = isTr
+      ? 'Sen BLOOM uygulamasının haftalık içgörü koçusun. Kullanıcının verilerini analiz ederek kişiselleştirilmiş, motive edici ve pratik bir haftalık rapor yaz. 3-4 paragraf, Türkçe. İstatistiklere atıfla, somut öneriler ver.'
+      : 'You are the weekly insights coach of the BLOOM app. Analyze the user\'s data and write a personalized, motivating and practical weekly report. 3-4 paragraphs, in English. Reference the statistics and give concrete suggestions.';
+
+    const userPrompt = isTr
+      ? `Bu hafta için içgörü raporu oluştur:\n${contextSummary}`
+      : `Generate an insights report for this week:\n${contextSummary}`;
 
     const openaiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiKey) return json({ error: 'OpenAI key not configured' }, 500);
@@ -81,14 +103,8 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          {
-            role: 'system',
-            content: 'Sen BLOOM uygulamasının haftalık içgörü koçusun. Kullanıcının verilerini analiz ederek kişiselleştirilmiş, motive edici ve pratik bir haftalık rapor yaz. 3-4 paragraf, Türkçe. İstatistiklere atıfla, somut öneriler ver.',
-          },
-          {
-            role: 'user',
-            content: `Bu hafta için içgörü raporu oluştur:\n${contextSummary}`,
-          },
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
         ],
         max_tokens: 800,
         temperature: 0.7,
@@ -98,7 +114,6 @@ serve(async (req) => {
     const aiData = await openaiRes.json();
     const content = aiData.choices?.[0]?.message?.content ?? '';
 
-    // Kaydet
     await serviceClient.from('insights').upsert({
       user_id: user.id,
       week_start: weekStartStr,

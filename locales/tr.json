@@ -1,0 +1,5 @@
+{
+  "NSUserNotificationsUsageDescription": "BLOOM seni doğru zamanda hatırlatmak için bildirimlere ihtiyaç duyar.",
+  "NSCameraUsageDescription": "Profil fotoğrafı eklemek için kameraya erişim gereklidir.",
+  "NSPhotoLibraryUsageDescription": "Profil fotoğrafı seçmek için fotoğraf kitaplığına erişim gereklidir."
+}

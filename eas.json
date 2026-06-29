@@ -24,25 +24,9 @@
       }
     },
     "production": {
-      "autoIncrement": true,
-      "ios": {
-        "enterpriseProvisioning": "adhoc"
-      },
+      "autoIncrement": false,
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://vjqspziumgzesiqcaeme.supabase.co"
-      }
-    }
-  },
-  "submit": {
-    "production": {
-      "ios": {
-        "appleId": "barangunduzdesign@gmail.com",
-        "ascAppId": "",
-        "appleTeamId": ""
-      },
-      "android": {
-        "serviceAccountKeyPath": "./google-service-account.json",
-        "track": "production"
       }
     }
   }

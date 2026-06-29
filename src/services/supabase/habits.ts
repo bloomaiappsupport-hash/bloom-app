@@ -1,5 +1,5 @@
 import { supabase } from './client';
-import { Habit, Completion, Streak, Mood, HabitStack } from '../../types';
+import { Habit, Completion, Streak, Mood, HabitStack, HabitCategory } from '../../types';
 
 export const habitsService = {
   getHabits: (userId: string) =>
@@ -28,10 +28,10 @@ export const habitsService = {
       .lte('completed_at', `${today}T23:59:59`);
   },
 
-  completeHabit: (habitId: string, userId: string, mood?: Mood) =>
+  completeHabit: (habitId: string, userId: string, mood?: Mood, category?: HabitCategory) =>
     supabase
       .from('completions')
-      .insert({ habit_id: habitId, user_id: userId, mood: mood ?? null })
+      .insert({ habit_id: habitId, user_id: userId, mood: mood ?? null, category: category ?? null })
       .select()
       .single(),
 

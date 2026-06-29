@@ -3,6 +3,10 @@
     "name": "BLOOM",
     "slug": "bloom-habit-coach",
     "version": "1.0.0",
+    "locales": {
+      "en": "./locales/en.json",
+      "tr": "./locales/tr.json"
+    },
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -18,7 +22,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.barangunduz.bloomhabit",
-      "buildNumber": "1",
+      "buildNumber": "11",
       "requireFullScreen": true,
       "infoPlist": {
         "NSUserNotificationsUsageDescription": "BLOOM seni doğru zamanda hatırlatmak için bildirimlere ihtiyaç duyar.",

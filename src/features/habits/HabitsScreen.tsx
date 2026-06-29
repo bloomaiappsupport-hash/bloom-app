@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Modal, TextInput, Alert, Dimensions,
+  Modal, TextInput, Alert, Dimensions, NativeScrollEvent, NativeSyntheticEvent, Animated,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Rect, Line } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
@@ -76,22 +77,23 @@ function CatWork({ size = 18, color = '#fff' }) {
   );
 }
 
-function getCategoryConfig(c: ReturnType<typeof useColors>): Record<HabitCategory, { color: string; Icon: React.FC<{ size?: number; color?: string }>; label: string; defaultIcon: HabitIconKey }> {
+function getCategoryConfig(c: ReturnType<typeof useColors>, t: (k: string) => string): Record<HabitCategory, { color: string; Icon: React.FC<{ size?: number; color?: string }>; label: string; defaultIcon: HabitIconKey }> {
   return {
-    fitness: { color: c.fitness, Icon: CatFitness, label: 'Fitness', defaultIcon: 'dumbbell' },
-    mind: { color: c.mind, Icon: CatMind, label: 'Zihin', defaultIcon: 'brain' },
-    sleep: { color: c.sleep, Icon: CatSleep, label: 'Uyku', defaultIcon: 'moon' },
-    nutrition: { color: c.nutrition, Icon: CatNutrition, label: 'Beslenme', defaultIcon: 'leaf' },
-    social: { color: c.social, Icon: CatSocial, label: 'Sosyal', defaultIcon: 'people' },
-    work: { color: c.work, Icon: CatWork, label: 'Kariyer', defaultIcon: 'rocket' },
-    custom: { color: c.primary, Icon: IcSparkle, label: 'Özel', defaultIcon: 'target' },
+    fitness: { color: c.fitness, Icon: CatFitness, label: t('habits.category.fitness'), defaultIcon: 'dumbbell' },
+    mind: { color: c.mind, Icon: CatMind, label: t('habits.category.mind'), defaultIcon: 'brain' },
+    sleep: { color: c.sleep, Icon: CatSleep, label: t('habits.category.sleep'), defaultIcon: 'moon' },
+    nutrition: { color: c.nutrition, Icon: CatNutrition, label: t('habits.category.nutrition'), defaultIcon: 'leaf' },
+    social: { color: c.social, Icon: CatSocial, label: t('habits.category.social'), defaultIcon: 'people' },
+    work: { color: c.work, Icon: CatWork, label: t('habits.category.work'), defaultIcon: 'rocket' },
+    custom: { color: c.primary, Icon: IcSparkle, label: t('habits.category.custom'), defaultIcon: 'target' },
   };
 }
 
-function HabitCard({ habit, streak, shields }: { habit: Habit; streak?: number; shields?: number }) {
+function HabitCard({ habit, streak, shields, onPress }: { habit: Habit; streak?: number; shields?: number; onPress?: () => void }) {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const CATEGORY_CONFIG = useMemo(() => getCategoryConfig(colors), [colors]);
+  const { t } = useTranslation();
+  const CATEGORY_CONFIG = useMemo(() => getCategoryConfig(colors, t), [colors, t]);
   const { removeHabit, useShield } = useHabitStore();
   const { plan } = useAuthStore();
   const cfg = CATEGORY_CONFIG[habit.category];
@@ -100,12 +102,12 @@ function HabitCard({ habit, streak, shields }: { habit: Habit; streak?: number; 
     if (!shields || shields <= 0) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
-      '🛡️ Kalkan Kullan',
-      `Bir kalkan harcayarak bugünkü ${habit.title} serisini koru. Kalan: ${shields} kalkan`,
+      t('habits.shieldTitle'),
+      t('habits.shieldMessage', { title: habit.title, shields }),
       [
-        { text: 'İptal', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Kullan',
+          text: t('common.done'),
           onPress: async () => {
             const updated = useShield(habit.id);
             if (updated) {
@@ -121,23 +123,23 @@ function HabitCard({ habit, streak, shields }: { habit: Habit; streak?: number; 
   const handleLongPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     const options: any[] = [
-      { text: 'İptal', style: 'cancel' },
+      { text: t('common.cancel'), style: 'cancel' },
     ];
     if (plan === 'premium' && shields && shields > 0) {
-      options.push({ text: `🛡️ Kalkan Kullan (${shields})`, onPress: handleUseShield });
+      options.push({ text: t('habits.useShield', { count: shields }), onPress: handleUseShield });
     }
     options.push({
-      text: 'Sil', style: 'destructive', onPress: async () => {
+      text: t('common.delete'), style: 'destructive', onPress: async () => {
         await habitsService.deleteHabit(habit.id);
         removeHabit(habit.id);
         cancelHabitNotification(habit.id);
       },
     });
-    Alert.alert('Alışkanlık', habit.title, options);
+    Alert.alert(t('habits.title'), habit.title, options);
   };
 
   return (
-    <TouchableOpacity onLongPress={handleLongPress} activeOpacity={0.85}>
+    <TouchableOpacity onPress={onPress} onLongPress={handleLongPress} activeOpacity={0.85}>
       <GlassCard style={styles.habitCard}>
         <View style={styles.habitCardContent}>
           <View style={[styles.habitIcon, { backgroundColor: cfg.color + '20' }]}>
@@ -151,7 +153,7 @@ function HabitCard({ habit, streak, shields }: { habit: Habit; streak?: number; 
                 <Text style={[styles.categoryBadgeText, { color: cfg.color }]}>{cfg.label}</Text>
               </View>
               <Text style={styles.freqText}>
-                {habit.frequency_type === 'daily' ? 'Her gün' : 'Haftalık'}
+                {habit.frequency_type === 'daily' ? t('habits.frequency.daily') : t('habits.frequency.weekly')}
               </Text>
             </View>
           </View>
@@ -179,10 +181,121 @@ function HabitCard({ habit, streak, shields }: { habit: Habit; streak?: number; 
   );
 }
 
+const PICKER_ITEM_H = 44;
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+const MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+
+function ScrollPicker({
+  values,
+  selectedIndex,
+  onSelect,
+  color,
+}: {
+  values: string[];
+  selectedIndex: number;
+  onSelect: (i: number) => void;
+  color: string;
+}) {
+  const ref = useRef<ScrollView>(null);
+  const isScrollingRef = useRef(false);
+
+  useEffect(() => {
+    if (!isScrollingRef.current) {
+      ref.current?.scrollTo({ y: selectedIndex * PICKER_ITEM_H, animated: false });
+    }
+  }, [selectedIndex]);
+
+  const handleScrollBegin = () => { isScrollingRef.current = true; };
+
+  const handleScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    isScrollingRef.current = false;
+    const raw = e.nativeEvent.contentOffset.y;
+    const idx = Math.max(0, Math.min(values.length - 1, Math.round(raw / PICKER_ITEM_H)));
+    onSelect(idx);
+  };
+
+  return (
+    <View style={{ height: PICKER_ITEM_H * 3, overflow: 'hidden', width: 64 }}>
+      <ScrollView
+        ref={ref}
+        showsVerticalScrollIndicator={false}
+        snapToInterval={PICKER_ITEM_H}
+        decelerationRate="fast"
+        onScrollBeginDrag={handleScrollBegin}
+        onMomentumScrollEnd={handleScrollEnd}
+        contentContainerStyle={{ paddingVertical: PICKER_ITEM_H }}
+      >
+        {values.map((val, i) => {
+          const isSelected = i === selectedIndex;
+          return (
+            <TouchableOpacity
+              key={i}
+              onPress={() => {
+                onSelect(i);
+                ref.current?.scrollTo({ y: i * PICKER_ITEM_H, animated: true });
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={{ height: PICKER_ITEM_H, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{
+                  fontSize: isSelected ? 30 : 18,
+                  fontWeight: isSelected ? '700' : '400',
+                  color: isSelected ? color : color + '40',
+                  fontVariant: ['tabular-nums'] as any,
+                }}>
+                  {val}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute', top: PICKER_ITEM_H, left: 0, right: 0,
+          height: PICKER_ITEM_H,
+          borderTopWidth: 1, borderBottomWidth: 1,
+          borderColor: color + '30',
+        }}
+      />
+    </View>
+  );
+}
+
+function useSheetAnimation(visible: boolean, onClose: () => void) {
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const sheetY = useRef(new Animated.Value(500)).current;
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (visible) {
+      overlayOpacity.setValue(0);
+      sheetY.setValue(500);
+      Animated.parallel([
+        Animated.timing(overlayOpacity, { toValue: 1, duration: 240, useNativeDriver: true }),
+        Animated.spring(sheetY, { toValue: 0, tension: 70, friction: 12, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [visible]);
+
+  const dismiss = () => {
+    Animated.parallel([
+      Animated.timing(overlayOpacity, { toValue: 0, duration: 200, useNativeDriver: true }),
+      Animated.timing(sheetY, { toValue: 500, duration: 220, useNativeDriver: true }),
+    ]).start(() => onCloseRef.current());
+  };
+
+  return { overlayOpacity, sheetY, dismiss };
+}
+
 function AddHabitModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const CATEGORY_CONFIG = useMemo(() => getCategoryConfig(colors), [colors]);
+  const { t } = useTranslation();
+  const CATEGORY_CONFIG = useMemo(() => getCategoryConfig(colors, t), [colors, t]);
+  const { overlayOpacity, sheetY, dismiss } = useSheetAnimation(visible, onClose);
   const { addHabit } = useHabitStore();
   const { user } = useAuthStore();
   const [title, setTitle] = useState('');
@@ -209,7 +322,7 @@ function AddHabitModal({ visible, onClose }: { visible: boolean; onClose: () => 
       frequency_days: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : [1, 3, 5],
       reminder_time,
     });
-    if (error) { Alert.alert('Hata', error.message); return; }
+    if (error) { Alert.alert(t('habits.error'), error.message); return; }
     if (data) {
       addHabit(data);
       if (reminderEnabled) {
@@ -221,29 +334,30 @@ function AddHabitModal({ visible, onClose }: { visible: boolean; onClose: () => 
     setCategory('fitness');
     setIconKey('dumbbell');
     setReminderEnabled(false);
-    onClose();
+    dismiss();
   };
 
   const activeCfg = CATEGORY_CONFIG[category];
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalSheet}>
+    <Modal visible={visible} animationType="none" transparent onRequestClose={dismiss}>
+      <Animated.View style={[styles.modalOverlay, { opacity: overlayOpacity }]}>
+        <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={dismiss} />
+        <Animated.View style={[styles.modalSheet, { transform: [{ translateY: sheetY }] }]}>
           <LinearGradient colors={[colors.surface2, colors.surface]} style={StyleSheet.absoluteFill} />
           <View style={styles.modalHandle} />
-          <Text style={styles.modalTitle}>Yeni Alışkanlık</Text>
+          <Text style={styles.modalTitle}>{t('habits.newHabit')}</Text>
 
           <TextInput
             style={styles.modalInput}
             value={title}
             onChangeText={setTitle}
-            placeholder="Alışkanlık adı..."
+            placeholder={t('habits.namePlaceholder')}
             placeholderTextColor={colors.textMuted}
             autoFocus
           />
 
-          <Text style={styles.modalLabel}>Kategori</Text>
+          <Text style={styles.modalLabel}>{t('habits.labelCategory')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
             {(Object.keys(CATEGORY_CONFIG) as HabitCategory[]).map((cat) => {
               const cfg = CATEGORY_CONFIG[cat];
@@ -261,7 +375,7 @@ function AddHabitModal({ visible, onClose }: { visible: boolean; onClose: () => 
             })}
           </ScrollView>
 
-          <Text style={styles.modalLabel}>İkon</Text>
+          <Text style={styles.modalLabel}>{t('habits.labelIcon')}</Text>
           <View style={styles.iconGrid}>
             {HABIT_ICON_KEYS.map((key) => {
               const isSelected = iconKey === key;
@@ -277,7 +391,7 @@ function AddHabitModal({ visible, onClose }: { visible: boolean; onClose: () => 
             })}
           </View>
 
-          <Text style={styles.modalLabel}>Sıklık</Text>
+          <Text style={styles.modalLabel}>{t('habits.labelFrequency')}</Text>
           <View style={styles.freqRow}>
             {(['daily', 'weekly'] as const).map((f) => (
               <TouchableOpacity
@@ -286,14 +400,14 @@ function AddHabitModal({ visible, onClose }: { visible: boolean; onClose: () => 
                 style={[styles.freqBtn, frequency === f && styles.freqBtnActive]}
               >
                 <Text style={[styles.freqBtnText, frequency === f && { color: colors.primary }]}>
-                  {f === 'daily' ? 'Her Gün' : 'Haftalık'}
+                  {f === 'daily' ? t('habits.frequency.dailyBtn') : t('habits.frequency.weeklyBtn')}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
 
           <View style={styles.reminderRow}>
-            <Text style={styles.modalLabel}>Hatırlatıcı</Text>
+            <Text style={styles.modalLabel}>{t('habits.labelReminder')}</Text>
             <TouchableOpacity
               onPress={() => setReminderEnabled((v) => !v)}
               style={[styles.toggle, reminderEnabled && { backgroundColor: colors.primary }]}
@@ -305,51 +419,265 @@ function AddHabitModal({ visible, onClose }: { visible: boolean; onClose: () => 
 
           {reminderEnabled && (
             <View style={styles.timePicker}>
-              <View style={styles.timeUnit}>
-                <TouchableOpacity onPress={() => setReminderHour((h) => (h + 1) % 24)} style={styles.timeArrow}>
-                  <Text style={styles.timeArrowText}>▲</Text>
-                </TouchableOpacity>
-                <Text style={[styles.timeValue, { color: colors.primary }]}>
-                  {String(reminderHour).padStart(2, '0')}
-                </Text>
-                <TouchableOpacity onPress={() => setReminderHour((h) => (h - 1 + 24) % 24)} style={styles.timeArrow}>
-                  <Text style={styles.timeArrowText}>▼</Text>
-                </TouchableOpacity>
-              </View>
-              <Text style={[styles.timeColon, { color: colors.textMuted }]}>:</Text>
-              <View style={styles.timeUnit}>
-                <TouchableOpacity onPress={() => setReminderMinute((m) => (m + 15) % 60)} style={styles.timeArrow}>
-                  <Text style={styles.timeArrowText}>▲</Text>
-                </TouchableOpacity>
-                <Text style={[styles.timeValue, { color: colors.primary }]}>
-                  {String(reminderMinute).padStart(2, '0')}
-                </Text>
-                <TouchableOpacity onPress={() => setReminderMinute((m) => (m - 15 + 60) % 60)} style={styles.timeArrow}>
-                  <Text style={styles.timeArrowText}>▼</Text>
-                </TouchableOpacity>
-              </View>
+              <ScrollPicker
+                values={HOURS}
+                selectedIndex={reminderHour}
+                onSelect={setReminderHour}
+                color={colors.primary}
+              />
+              <Text style={[styles.timeColon, { color: colors.primary + '80' }]}>:</Text>
+              <ScrollPicker
+                values={MINUTES}
+                selectedIndex={reminderMinute}
+                onSelect={setReminderMinute}
+                color={colors.primary}
+              />
             </View>
           )}
 
           <View style={styles.modalActions}>
-            <TouchableOpacity onPress={onClose} style={styles.cancelBtn}>
-              <Text style={styles.cancelText}>İptal</Text>
+            <TouchableOpacity onPress={dismiss} style={styles.cancelBtn}>
+              <Text style={styles.cancelText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
-            <GradientButton label="Kaydet" onPress={handleSave} style={styles.saveBtn} />
+            <GradientButton label={t('common.save')} onPress={handleSave} style={styles.saveBtn} />
           </View>
-        </View>
-      </View>
+        </Animated.View>
+      </Animated.View>
+    </Modal>
+  );
+}
+
+const editSheetStyles = StyleSheet.create({
+  streakRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.xl },
+  streakBox: { flex: 1, alignItems: 'center', paddingVertical: spacing.md, borderRadius: radius.xl, borderWidth: 1, gap: 4 },
+  streakVal: { ...typography.h3, fontWeight: '700' as const },
+  streakLbl: { ...typography.caption },
+  deleteBtn: { marginBottom: spacing.md, paddingVertical: spacing.base, borderRadius: radius.lg, borderWidth: 1, alignItems: 'center' as const },
+  deleteBtnText: { ...typography.bodyMedium, fontWeight: '600' as const },
+});
+
+function HabitEditSheet({ habit, onClose }: { habit: Habit | null; onClose: () => void }) {
+  const colors = useColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { t } = useTranslation();
+  const CATEGORY_CONFIG = useMemo(() => getCategoryConfig(colors, t), [colors, t]);
+  const { overlayOpacity, sheetY, dismiss } = useSheetAnimation(!!habit, onClose);
+  const { updateHabit, removeHabit, streaks } = useHabitStore();
+
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState<HabitCategory>('fitness');
+  const [iconKey, setIconKey] = useState<HabitIconKey>('dumbbell');
+  const [frequency, setFrequency] = useState<'daily' | 'weekly'>('daily');
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+  const [reminderHour, setReminderHour] = useState(9);
+  const [reminderMinute, setReminderMinute] = useState(0);
+
+  useEffect(() => {
+    if (!habit) return;
+    setTitle(habit.title);
+    setCategory(habit.category);
+    setIconKey(habit.icon as HabitIconKey);
+    setFrequency(habit.frequency_type === 'weekly' ? 'weekly' : 'daily');
+    if (habit.reminder_time) {
+      const [h, m] = habit.reminder_time.split(':').map(Number);
+      setReminderHour(h);
+      setReminderMinute(m);
+      setReminderEnabled(true);
+    } else {
+      setReminderEnabled(false);
+      setReminderHour(9);
+      setReminderMinute(0);
+    }
+  }, [habit?.id]);
+
+  if (!habit) return null;
+
+  const streak = streaks[habit.id];
+  const cfg = CATEGORY_CONFIG[category];
+
+  const handleSave = async () => {
+    if (!title.trim()) return;
+    const reminder_time = reminderEnabled
+      ? `${String(reminderHour).padStart(2, '0')}:${String(reminderMinute).padStart(2, '0')}`
+      : null;
+    const updates: Partial<Habit> = {
+      title: title.trim(),
+      category,
+      icon: iconKey,
+      color: cfg.color,
+      frequency_type: frequency,
+      frequency_days: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : [1, 3, 5],
+      reminder_time,
+    };
+    const { error } = await habitsService.updateHabit(habit.id, updates);
+    if (error) { Alert.alert(t('habits.error'), error.message); return; }
+    updateHabit(habit.id, updates);
+    cancelHabitNotification(habit.id);
+    if (reminderEnabled) {
+      scheduleHabitNotification(habit.id, title.trim(), reminderHour, reminderMinute);
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    dismiss();
+  };
+
+  const handleDelete = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    Alert.alert(t('habits.deleteTitle'), t('habits.deleteMsg', { title: habit.title }), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('common.delete'), style: 'destructive', onPress: async () => {
+          await habitsService.deleteHabit(habit.id);
+          removeHabit(habit.id);
+          cancelHabitNotification(habit.id);
+          dismiss();
+        },
+      },
+    ]);
+  };
+
+  return (
+    <Modal visible={!!habit} animationType="none" transparent onRequestClose={dismiss}>
+      <Animated.View style={[styles.modalOverlay, { opacity: overlayOpacity }]}>
+        <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={dismiss} />
+        <Animated.View style={[styles.modalSheet, { transform: [{ translateY: sheetY }] }]}>
+          <LinearGradient colors={[colors.surface2, colors.surface]} style={StyleSheet.absoluteFill} />
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.modalHandle} />
+          <Text style={styles.modalTitle}>{habit.title}</Text>
+
+          {streak && (
+            <View style={editSheetStyles.streakRow}>
+              <View style={[editSheetStyles.streakBox, { backgroundColor: colors.accent + '15', borderColor: colors.accent + '30' }]}>
+                <IcFlame size={16} color={colors.accent} />
+                <Text style={[editSheetStyles.streakVal, { color: colors.accent }]}>{streak.current_streak}</Text>
+                <Text style={[editSheetStyles.streakLbl, { color: colors.textMuted }]}>{t('habits.streakLabel')}</Text>
+              </View>
+              <View style={[editSheetStyles.streakBox, { backgroundColor: colors.secondary + '15', borderColor: colors.secondary + '30' }]}>
+                <IcSparkle size={16} color={colors.secondary} />
+                <Text style={[editSheetStyles.streakVal, { color: colors.secondary }]}>{streak.longest_streak}</Text>
+                <Text style={[editSheetStyles.streakLbl, { color: colors.textMuted }]}>{t('habits.bestLabel')}</Text>
+              </View>
+              {streak.shields_remaining > 0 && (
+                <View style={[editSheetStyles.streakBox, { backgroundColor: colors.info + '15', borderColor: colors.info + '30' }]}>
+                  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
+                    <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                      stroke={colors.info} strokeWidth="1.8" strokeLinejoin="round" fill={colors.info + '20'} />
+                  </Svg>
+                  <Text style={[editSheetStyles.streakVal, { color: colors.info }]}>{streak.shields_remaining}</Text>
+                  <Text style={[editSheetStyles.streakLbl, { color: colors.textMuted }]}>{t('habits.shieldLabel')}</Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          <TextInput
+            style={styles.modalInput}
+            value={title}
+            onChangeText={setTitle}
+            placeholder={t('habits.namePlaceholder')}
+            placeholderTextColor={colors.textMuted}
+          />
+
+          <Text style={styles.modalLabel}>{t('habits.labelCategory')}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
+            {(Object.keys(CATEGORY_CONFIG) as HabitCategory[]).map((cat) => {
+              const catCfg = CATEGORY_CONFIG[cat];
+              const isSelected = category === cat;
+              return (
+                <TouchableOpacity
+                  key={cat}
+                  onPress={() => { setCategory(cat); setIconKey(catCfg.defaultIcon); }}
+                  style={[styles.categoryChip, isSelected && { backgroundColor: catCfg.color + '25', borderColor: catCfg.color }]}
+                >
+                  <catCfg.Icon size={14} color={isSelected ? catCfg.color : colors.textMuted} />
+                  <Text style={[styles.categoryChipText, isSelected && { color: catCfg.color }]}>{catCfg.label}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          <Text style={styles.modalLabel}>{t('habits.labelIcon')}</Text>
+          <View style={styles.iconGrid}>
+            {HABIT_ICON_KEYS.map((key) => {
+              const isSelected = iconKey === key;
+              return (
+                <TouchableOpacity
+                  key={key}
+                  onPress={() => setIconKey(key)}
+                  style={[styles.iconOption, isSelected && { borderColor: cfg.color, backgroundColor: cfg.color + '20' }]}
+                >
+                  <HabitIcon iconKey={key} size={22} color={isSelected ? cfg.color : colors.textMuted} />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <Text style={styles.modalLabel}>{t('habits.labelFrequency')}</Text>
+          <View style={styles.freqRow}>
+            {(['daily', 'weekly'] as const).map((f) => (
+              <TouchableOpacity
+                key={f}
+                onPress={() => setFrequency(f)}
+                style={[styles.freqBtn, frequency === f && styles.freqBtnActive]}
+              >
+                <Text style={[styles.freqBtnText, frequency === f && { color: colors.primary }]}>
+                  {f === 'daily' ? t('habits.frequency.dailyBtn') : t('habits.frequency.weeklyBtn')}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={styles.reminderRow}>
+            <Text style={styles.modalLabel}>{t('habits.labelReminder')}</Text>
+            <TouchableOpacity
+              onPress={() => setReminderEnabled((v) => !v)}
+              style={[styles.toggle, reminderEnabled && { backgroundColor: colors.primary }]}
+              activeOpacity={0.8}
+            >
+              <View style={[styles.toggleThumb, reminderEnabled && styles.toggleThumbOn]} />
+            </TouchableOpacity>
+          </View>
+
+          {reminderEnabled && (
+            <View style={styles.timePicker}>
+              <ScrollPicker values={HOURS} selectedIndex={reminderHour} onSelect={setReminderHour} color={colors.primary} />
+              <Text style={[styles.timeColon, { color: colors.primary + '80' }]}>:</Text>
+              <ScrollPicker values={MINUTES} selectedIndex={reminderMinute} onSelect={setReminderMinute} color={colors.primary} />
+            </View>
+          )}
+
+          <TouchableOpacity
+            onPress={handleDelete}
+            style={[editSheetStyles.deleteBtn, { borderColor: colors.error + '50', backgroundColor: colors.error + '10' }]}
+            activeOpacity={0.8}
+          >
+            <Text style={[editSheetStyles.deleteBtnText, { color: colors.error }]}>{t('habits.delete')}</Text>
+          </TouchableOpacity>
+
+          <View style={styles.modalActions}>
+            <TouchableOpacity onPress={dismiss} style={styles.cancelBtn}>
+              <Text style={styles.cancelText}>{t('common.cancel')}</Text>
+            </TouchableOpacity>
+            <GradientButton label={t('common.save')} onPress={handleSave} style={styles.saveBtn} />
+          </View>
+        </ScrollView>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 }
 
 const FREE_HABIT_LIMIT = 5;
 
-const TIME_LABELS: Record<HabitStack['time_of_day'], string> = {
-  morning: '🌅 Sabah',
-  afternoon: '☀️ Öğlen',
-  evening: '🌆 Akşam',
-  night: '🌙 Gece',
+const TIME_LABEL_ICONS: Record<HabitStack['time_of_day'], string> = {
+  morning: '🌅',
+  afternoon: '☀️',
+  evening: '🌆',
+  night: '🌙',
 };
 
 function StackCard({ stack, habits, onDelete }: {
@@ -358,15 +686,19 @@ function StackCard({ stack, habits, onDelete }: {
   onDelete: () => void;
 }) {
   const colors = useColors();
+  const { t } = useTranslation();
   const stackHabits = habits.filter((h) => stack.habit_ids.includes(h.id));
+
+  const timeKey = `habits.time${stack.time_of_day.charAt(0).toUpperCase() + stack.time_of_day.slice(1)}` as const;
+  const timeLabel = `${TIME_LABEL_ICONS[stack.time_of_day]} ${t(timeKey)}`;
 
   return (
     <TouchableOpacity
       onLongPress={() => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        Alert.alert('Rutin', stack.name, [
-          { text: 'İptal', style: 'cancel' },
-          { text: 'Sil', style: 'destructive', onPress: onDelete },
+        Alert.alert(t('habits.rutin'), stack.name, [
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('common.delete'), style: 'destructive', onPress: onDelete },
         ]);
       }}
       activeOpacity={0.85}
@@ -374,7 +706,7 @@ function StackCard({ stack, habits, onDelete }: {
       <GlassCard style={stackCardStyle}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.sm }}>
           <Text style={{ ...typography.bodyMedium, color: colors.textPrimary }}>{stack.name}</Text>
-          <Text style={{ ...typography.caption, color: colors.primary }}>{TIME_LABELS[stack.time_of_day]}</Text>
+          <Text style={{ ...typography.caption, color: colors.primary }}>{timeLabel}</Text>
         </View>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs }}>
           {stackHabits.map((h) => (
@@ -383,7 +715,7 @@ function StackCard({ stack, habits, onDelete }: {
             </View>
           ))}
           {stackHabits.length === 0 && (
-            <Text style={{ ...typography.caption, color: colors.textMuted }}>Alışkanlık eklenmemiş</Text>
+            <Text style={{ ...typography.caption, color: colors.textMuted }}>{t('habits.stackNoHabits')}</Text>
           )}
         </View>
       </GlassCard>
@@ -433,11 +765,11 @@ function IcMoonStar({ color = '#fff', size = 20 }) {
   );
 }
 
-const TIME_OPTIONS: { key: HabitStack['time_of_day']; Icon: React.FC<{ color?: string; size?: number }>; label: string }[] = [
-  { key: 'morning', Icon: IcSunrise, label: 'Sabah' },
-  { key: 'afternoon', Icon: IcSun, label: 'Öğlen' },
-  { key: 'evening', Icon: IcSunset, label: 'Akşam' },
-  { key: 'night', Icon: IcMoonStar, label: 'Gece' },
+const TIME_OPTIONS: { key: HabitStack['time_of_day']; Icon: React.FC<{ color?: string; size?: number }>; labelKey: string }[] = [
+  { key: 'morning', Icon: IcSunrise, labelKey: 'habits.timeMorning' },
+  { key: 'afternoon', Icon: IcSun, labelKey: 'habits.timeAfternoon' },
+  { key: 'evening', Icon: IcSunset, labelKey: 'habits.timeEvening' },
+  { key: 'night', Icon: IcMoonStar, labelKey: 'habits.timeNight' },
 ];
 
 function AddStackModal({ visible, onClose, habits }: {
@@ -446,6 +778,8 @@ function AddStackModal({ visible, onClose, habits }: {
   habits: Habit[];
 }) {
   const colors = useColors();
+  const { t } = useTranslation();
+  const { overlayOpacity, sheetY, dismiss } = useSheetAnimation(visible, onClose);
   const { user } = useAuthStore();
   const [name, setName] = useState('');
   const [selected, setSelected] = useState<string[]>([]);
@@ -462,7 +796,7 @@ function AddStackModal({ visible, onClose, habits }: {
       habit_ids: selected,
       time_of_day: timeOfDay,
     });
-    if (error) { Alert.alert('Hata', error.message); return; }
+    if (error) { Alert.alert(t('habits.error'), error.message); return; }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setName(''); setSelected([]); setTimeOfDay('morning');
     onClose();
@@ -474,45 +808,46 @@ function AddStackModal({ visible, onClose, habits }: {
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
-      <View style={stackModalStyles.overlay}>
-        <View style={stackModalStyles.sheet}>
+    <Modal visible={visible} animationType="none" transparent onRequestClose={dismiss}>
+      <Animated.View style={[stackModalStyles.overlay, { opacity: overlayOpacity }]}>
+        <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={dismiss} />
+        <Animated.View style={[stackModalStyles.sheet, { transform: [{ translateY: sheetY }] }]}>
           <LinearGradient colors={[colors.surface2, colors.surface]} style={StyleSheet.absoluteFill} />
           <View style={[stackModalStyles.handle, { backgroundColor: colors.border }]} />
 
-          <Text style={[stackModalStyles.title, { color: colors.textPrimary }]}>Yeni Rutin Stack</Text>
+          <Text style={[stackModalStyles.title, { color: colors.textPrimary }]}>{t('habits.newStack')}</Text>
 
           <TextInput
             style={[stackModalStyles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.textPrimary }]}
             value={name}
             onChangeText={setName}
-            placeholder="Rutin adı (ör. Sabah Ritüeli)..."
+            placeholder={t('habits.stackNamePlaceholder')}
             placeholderTextColor={colors.textMuted}
             autoFocus
           />
 
-          <Text style={[stackModalStyles.label, { color: colors.textSecondary }]}>Zaman</Text>
+          <Text style={[stackModalStyles.label, { color: colors.textSecondary }]}>{t('habits.stackTimeLabel')}</Text>
           <View style={stackModalStyles.timeRow}>
-            {TIME_OPTIONS.map((t) => {
-              const isActive = timeOfDay === t.key;
+            {TIME_OPTIONS.map((opt) => {
+              const isActive = timeOfDay === opt.key;
               return (
                 <TouchableOpacity
-                  key={t.key}
-                  onPress={() => setTimeOfDay(t.key)}
+                  key={opt.key}
+                  onPress={() => setTimeOfDay(opt.key)}
                   activeOpacity={0.8}
                   style={[
                     stackModalStyles.timeBtn,
                     { borderColor: isActive ? colors.primary : colors.border, backgroundColor: isActive ? colors.primary + '20' : colors.surface },
                   ]}
                 >
-                  <t.Icon size={20} color={isActive ? colors.primary : colors.textMuted} />
-                  <Text style={[stackModalStyles.timeLabel, { color: isActive ? colors.primary : colors.textMuted }]}>{t.label}</Text>
+                  <opt.Icon size={20} color={isActive ? colors.primary : colors.textMuted} />
+                  <Text style={[stackModalStyles.timeLabel, { color: isActive ? colors.primary : colors.textMuted }]}>{t(opt.labelKey)}</Text>
                 </TouchableOpacity>
               );
             })}
           </View>
 
-          <Text style={[stackModalStyles.label, { color: colors.textSecondary }]}>Alışkanlıklar</Text>
+          <Text style={[stackModalStyles.label, { color: colors.textSecondary }]}>{t('habits.stackHabitsLabel')}</Text>
           <ScrollView style={stackModalStyles.habitList} showsVerticalScrollIndicator={false}>
             {habits.map((h) => {
               const isSel = selected.includes(h.id);
@@ -547,16 +882,16 @@ function AddStackModal({ visible, onClose, habits }: {
 
           <View style={stackModalStyles.actions}>
             <TouchableOpacity onPress={handleClose} style={stackModalStyles.cancelBtn} activeOpacity={0.7}>
-              <Text style={[stackModalStyles.cancelText, { color: colors.textSecondary }]}>İptal</Text>
+              <Text style={[stackModalStyles.cancelText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
             </TouchableOpacity>
             <GradientButton
-              label="Kaydet"
+              label={t('common.save')}
               onPress={handleSave}
               style={stackModalStyles.saveBtn}
             />
           </View>
-        </View>
-      </View>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 }
@@ -606,13 +941,15 @@ timeLabel: { ...typography.captionBold },
 export default function HabitsScreen() {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const CATEGORY_CONFIG = useMemo(() => getCategoryConfig(colors), [colors]);
+  const { t } = useTranslation();
+  const CATEGORY_CONFIG = useMemo(() => getCategoryConfig(colors, t), [colors, t]);
   const { habits, streaks } = useHabitStore();
   const { plan, user } = useAuthStore();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [showAdd, setShowAdd] = useState(false);
   const [showAddStack, setShowAddStack] = useState(false);
   const [stacks, setStacks] = useState<HabitStack[]>([]);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -643,10 +980,10 @@ export default function HabitsScreen() {
   return (
     <ScreenContainer scrollable>
       <View style={styles.header}>
-        <Text style={styles.pageTitle}>Alışkanlıklar</Text>
+        <Text style={styles.pageTitle}>{t('habits.title')}</Text>
         <TouchableOpacity onPress={handleAddPress} activeOpacity={0.85}>
           <LinearGradient colors={[colors.primary, colors.primaryDim]} style={styles.addBtn}>
-            <Text style={styles.addBtnText}>+ Ekle</Text>
+            <Text style={styles.addBtnText}>{t('habits.addBtn')}</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -656,9 +993,9 @@ export default function HabitsScreen() {
           <View style={styles.emptyIconWrap}>
             <IcSparkle size={40} color={colors.primary} />
           </View>
-          <Text style={styles.emptyTitle}>Henüz alışkanlık yok</Text>
-          <Text style={styles.emptySubtitle}>İlk alışkanlığını ekleyerek bloom'unu inşa etmeye başla.</Text>
-          <GradientButton label="İlk Alışkanlığını Ekle" onPress={() => setShowAdd(true)} style={styles.emptyBtn} />
+          <Text style={styles.emptyTitle}>{t('habits.noHabits')}</Text>
+          <Text style={styles.emptySubtitle}>{t('habits.firstHabitSubtitle')}</Text>
+          <GradientButton label={t('habits.addFirst')} onPress={() => setShowAdd(true)} style={styles.emptyBtn} />
         </View>
       ) : (
         Object.entries(grouped).map(([cat, items]) => {
@@ -680,6 +1017,7 @@ export default function HabitsScreen() {
                   habit={habit}
                   streak={streaks[habit.id]?.current_streak}
                   shields={streaks[habit.id]?.shields_remaining}
+                  onPress={() => setEditingHabit(habit)}
                 />
               ))}
             </View>
@@ -696,17 +1034,17 @@ export default function HabitsScreen() {
                 <Path d="M4 6h16M4 12h16M4 18h16" stroke={colors.secondary} strokeWidth="2" strokeLinecap="round" />
               </Svg>
             </View>
-            <Text style={[styles.groupLabel, { flex: 1 }]}>Rutin Stack'ler</Text>
+            <Text style={[styles.groupLabel, { flex: 1 }]}>{t('habits.stacks')}</Text>
             <TouchableOpacity onPress={() => setShowAddStack(true)} activeOpacity={0.8}
               style={{ backgroundColor: colors.secondary + '20', paddingHorizontal: spacing.sm, paddingVertical: 4, borderRadius: radius.full }}>
-              <Text style={{ ...typography.captionBold, color: colors.secondary }}>+ Oluştur</Text>
+              <Text style={{ ...typography.captionBold, color: colors.secondary }}>{t('habits.createStack')}</Text>
             </TouchableOpacity>
           </View>
 
           {stacks.length === 0 ? (
             <GlassCard style={{ padding: spacing.base, alignItems: 'center', gap: spacing.sm }}>
               <Text style={{ ...typography.small, color: colors.textMuted, textAlign: 'center' }}>
-                Alışkanlıklarını zincirle bir sabah veya akşam rutini oluştur.
+                {t('habits.stackEmpty')}
               </Text>
             </GlassCard>
           ) : (
@@ -723,6 +1061,7 @@ export default function HabitsScreen() {
       )}
 
       <AddHabitModal visible={showAdd} onClose={() => setShowAdd(false)} />
+      <HabitEditSheet key={editingHabit?.id ?? 'none'} habit={editingHabit} onClose={() => setEditingHabit(null)} />
       <AddStackModal
         visible={showAddStack}
         onClose={() => {
@@ -754,26 +1093,26 @@ const staticStyles = StyleSheet.create({
   emptyBtn: { marginTop: spacing.md },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
   modalSheet: { borderTopLeftRadius: radius['3xl'], borderTopRightRadius: radius['3xl'], padding: spacing.base, paddingBottom: 40, overflow: 'hidden', minHeight: 600 },
-  modalHandle: { width: 40, height: 4, borderRadius: 2, alignSelf: 'center', marginBottom: spacing.base, backgroundColor: '#333' },
+  modalHandle: { width: 40, height: 4, borderRadius: 2, alignSelf: 'center', marginTop: spacing.md, marginBottom: spacing.xl, backgroundColor: '#333' },
   categoryScroll: { marginBottom: spacing.xl },
   categoryChip: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, borderWidth: 1, borderRadius: radius.full, paddingVertical: spacing.sm, paddingHorizontal: spacing.md, marginRight: spacing.sm },
   iconGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.xl },
   iconOption: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', borderRadius: radius.md, borderWidth: 1 },
   freqRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.xl },
   freqBtn: { flex: 1, paddingVertical: spacing.base, alignItems: 'center', borderRadius: radius.lg, borderWidth: 1 },
-  modalActions: { flexDirection: 'row', gap: spacing.md, alignItems: 'center' },
+  modalActions: { flexDirection: 'row', gap: spacing.md, alignItems: 'center', marginTop: spacing.md },
   cancelBtn: { flex: 1, paddingVertical: spacing.base, alignItems: 'center' },
   saveBtn: { flex: 2 },
   reminderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
   toggle: { width: 46, height: 26, borderRadius: 13, backgroundColor: '#333', justifyContent: 'center', paddingHorizontal: 3 },
   toggleThumb: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff' },
   toggleThumbOn: { alignSelf: 'flex-end' },
-  timePicker: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.md, backgroundColor: '#222', borderRadius: radius.xl, paddingVertical: spacing.md, marginBottom: spacing.md },
+  timePicker: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.lg, borderRadius: radius.xl, paddingVertical: spacing.sm, paddingHorizontal: spacing.xl, marginBottom: spacing.lg, borderWidth: 1 },
   timeUnit: { alignItems: 'center', gap: spacing.xs },
   timeArrow: { padding: spacing.sm },
   timeArrowText: { color: '#888', fontSize: 12 },
   timeValue: { ...typography.h2, fontSize: 32, fontVariant: ['tabular-nums'] as any },
-  timeColon: { ...typography.h2, fontSize: 32, marginBottom: 4 },
+  timeColon: { ...typography.h2, fontSize: 28, marginBottom: 2 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: spacing.xl, marginBottom: spacing.xl },
   group: { marginBottom: spacing.xl },
   groupHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.md },
@@ -808,5 +1147,6 @@ function createStyles(colors: ReturnType<typeof useColors>) {
     freqBtnActive: { borderColor: colors.primary },
     freqBtnText: { ...typography.smallMedium, color: colors.textSecondary },
     cancelText: { ...typography.bodyMedium, color: colors.textSecondary },
+    timePicker: { ...staticStyles.timePicker, backgroundColor: colors.primary + '12', borderColor: colors.primary + '25' },
   };
 }

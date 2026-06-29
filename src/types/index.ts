@@ -64,6 +64,7 @@ export interface Completion {
   user_id: string;
   completed_at: string;
   mood: Mood | null;
+  category: HabitCategory | null;
 }
 
 export interface Streak {

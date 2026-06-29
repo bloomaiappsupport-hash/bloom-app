@@ -78,7 +78,7 @@ function IcClose({ color = '#fff' }) {
   );
 }
 
-function IcDiamond({ size = 32, color = '#fff' }) {
+function IcDiamond({ size = 32, color = '#ffffff' }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Path d="M2 12l10-10 10 10-10 10L2 12z" stroke={color} strokeWidth="1.8"
@@ -161,7 +161,7 @@ export default function PaywallScreen() {
     if (connected) {
       fetchProducts({ skus: [SKU_MONTHLY, SKU_YEARLY], type: 'subs' });
     }
-  }, [connected]);
+  }, [connected, fetchProducts]);
 
   const subMonthly = subscriptions.find(s => s.id === SKU_MONTHLY);
   const subYearly = subscriptions.find(s => s.id === SKU_YEARLY);

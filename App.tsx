@@ -1,7 +1,25 @@
 import 'react-native-url-polyfill/auto';
 import './src/i18n';
 import React, { useEffect } from 'react';
+import { LogBox } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+
+LogBox.ignoreLogs([
+  'InteractionManager',
+  'Overriding previous layout animation',
+  'Non-serializable values were found in the navigation state',
+  'expo-notifications',
+  'new NativeEventEmitter',
+  'Warning: Each child in a list',
+  'fontFamily',
+  'RNIap',
+  'react-native-iap',
+  'IAPManagerError',
+  'getProducts',
+  'finishTransaction',
+  'Cannot read property',
+  'Possible Unhandled Promise Rejection',
+]);
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -19,6 +37,7 @@ import RootNavigator from './src/navigation/RootNavigator';
 import { authService, profileService, habitsService } from './src/services/supabase';
 import { useAuthStore } from './src/stores/authStore';
 import { useHabitStore } from './src/stores/habitStore';
+import { useLanguageStore } from './src/stores/languageStore';
 
 // SplashScreen.preventAutoHideAsync();
 
@@ -31,6 +50,7 @@ const queryClient = new QueryClient({
 export default function App() {
   const { setSession, setLoading, setProfile, setPlan } = useAuthStore();
   const { setHabits, setTodayCompletions, setStreak, setLoadingData } = useHabitStore();
+  const { loadLanguage } = useLanguageStore();
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -39,6 +59,10 @@ export default function App() {
     Inter_700Bold,
     Inter_800ExtraBold,
   });
+
+  useEffect(() => {
+    loadLanguage();
+  }, []);
 
   useEffect(() => {
     if (fontsLoaded) SplashScreen.hideAsync();

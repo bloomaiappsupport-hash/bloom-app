@@ -22,4 +22,7 @@ export const authService = {
 
   resetPassword: (email: string) =>
     supabase.auth.resetPasswordForEmail(email),
+
+  updatePassword: (newPassword: string) =>
+    supabase.auth.updateUser({ password: newPassword }),
 };

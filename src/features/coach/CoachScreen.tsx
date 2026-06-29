@@ -7,6 +7,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import * as Localization from 'expo-localization';
 import { typography, spacing, radius } from '../../theme';
 import { useColors } from '../../hooks/useColors';
 import { useAuthStore } from '../../stores/authStore';
@@ -50,24 +52,26 @@ function MessageBubble({ msg }: { msg: CoachMessage }) {
 export default function CoachScreen() {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { t } = useTranslation();
   const { user, plan, profile } = useAuthStore();
   const { habits, getTodayProgress } = useHabitStore();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const QUICK_PROMPTS = [
-    { label: 'Analiz', text: 'Alışkanlıklarımı analiz et', color: colors.secondary },
-    { label: 'Engel', text: 'Engellerin üstesinden nasıl gelirim?', color: colors.gold },
-    { label: 'Öneri', text: 'Yeni alışkanlık öner', color: colors.primaryGlow },
-    { label: 'Motive', text: 'Beni motive et', color: colors.accent },
+    { label: t('coach.quickAnalyzeLabel'), text: t('coach.quickAnalyzeText'), color: colors.secondary },
+    { label: t('coach.quickBarrierLabel'), text: t('coach.quickBarrierText'), color: colors.gold },
+    { label: t('coach.quickSuggestLabel'), text: t('coach.quickSuggestText'), color: colors.primaryGlow },
+    { label: t('coach.quickMotivateLabel'), text: t('coach.quickMotivateText'), color: colors.accent },
   ];
 
   const insets = useSafeAreaInsets();
 
+  const nameStr = profile?.name ? ` ${profile.name.split(' ')[0]}` : '';
   const [messages, setMessages] = useState<CoachMessage[]>([
     {
       id: '0',
       role: 'assistant',
-      content: `Merhaba${profile?.name ? ` ${profile.name.split(' ')[0]}` : ''}! Ben BLOOM'un AI koçuyum. Alışkanlıkların, hedeflerin veya günlük rutinin hakkında ne konuşmak istersin?`,
+      content: t('coach.greeting', { name: nameStr }),
       created_at: new Date().toISOString(),
     },
   ]);
@@ -79,9 +83,20 @@ export default function CoachScreen() {
   const isLimited = plan === 'free' && msgCount >= DAILY_FREE_LIMIT;
   const { completed, total } = getTodayProgress();
 
+  const isTurkishUser = (() => {
+    const locale = Localization.getLocales()[0];
+    const region = locale?.regionCode?.toUpperCase();
+    const lang = locale?.languageCode?.toLowerCase();
+    const timezone = locale?.timezone ?? '';
+    return region === 'TR' || lang === 'tr' || timezone.includes('Istanbul');
+  })();
+
   const buildContext = () => {
     const habitNames = habits.map((h) => h.title).join(', ');
-    return `Kullanıcı profili: ${habitNames ? `Aktif alışkanlıklar: ${habitNames}.` : 'Henüz alışkanlık yok.'} Bugün ${completed}/${total} alışkanlık tamamlandı.`;
+    const langInstruction = isTurkishUser
+      ? 'ÖNEMLİ: Kullanıcı Türkiye\'den. Uygulama dili ne olursa olsun her zaman Türkçe yanıt ver.'
+      : 'IMPORTANT: User is from abroad. Always respond in English regardless of the app language.';
+    return `${langInstruction}\nUser profile: ${habitNames ? `Active habits: ${habitNames}.` : 'No habits yet.'} Today ${completed}/${total} habits completed.`;
   };
 
   const sendMessage = async (text: string) => {
@@ -112,7 +127,7 @@ export default function CoachScreen() {
       });
 
       if (error) throw new Error(error.message);
-      const reply: string = data?.reply ?? 'Bir hata oluştu, tekrar dene.';
+      const reply: string = data?.reply ?? t('coach.errorReply');
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -123,7 +138,7 @@ export default function CoachScreen() {
       setMessages((prev) => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Bağlantı hatası. İnternet bağlantını kontrol et.',
+        content: t('coach.connectionError'),
         created_at: new Date().toISOString(),
       }]);
     } finally {
@@ -146,9 +161,9 @@ export default function CoachScreen() {
             <BloomLogo size={28} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.headerTitle}>AI Koç</Text>
+            <Text style={styles.headerTitle}>{t('coach.title')}</Text>
             <Text style={styles.headerSub}>
-              {plan === 'free' ? `${DAILY_FREE_LIMIT - msgCount} mesaj kaldı` : 'Premium — Sınırsız'}
+              {plan === 'free' ? t('coach.messagesLeft', { count: DAILY_FREE_LIMIT - msgCount }) : t('coach.premiumUnlimited')}
             </Text>
           </View>
         </View>
@@ -164,7 +179,7 @@ export default function CoachScreen() {
         ListFooterComponent={loading ? (
           <View style={styles.typingIndicator}>
             <ActivityIndicator size="small" color={colors.primary} />
-            <Text style={styles.typingText}>Düşünüyor...</Text>
+            <Text style={styles.typingText}>{t('coach.thinking')}</Text>
           </View>
         ) : null}
       />
@@ -185,10 +200,10 @@ export default function CoachScreen() {
 
       {isLimited ? (
         <GlassCard style={styles.limitBanner}>
-          <Text style={styles.limitTitle}>Günlük limit doldu</Text>
-          <Text style={styles.limitText}>Sınırsız AI koçluk için Premium'a geç.</Text>
+          <Text style={styles.limitTitle}>{t('coach.dailyLimitTitle')}</Text>
+          <Text style={styles.limitText}>{t('coach.dailyLimitText')}</Text>
           <GradientButton
-            label="Premium'a Geç"
+            label={t('profile.goPremium')}
             onPress={() => navigation.navigate('Paywall')}
             style={styles.limitBtn}
           />
@@ -199,7 +214,7 @@ export default function CoachScreen() {
             style={styles.input}
             value={input}
             onChangeText={setInput}
-            placeholder="Bir şey sor veya paylaş..."
+            placeholder={t('coach.placeholder')}
             placeholderTextColor={colors.textMuted}
             multiline
             maxLength={500}
