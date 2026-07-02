@@ -55,7 +55,7 @@ const FEATURES = [
 
 const FALLBACK = {
   monthly: { price: isTurkish ? '₺99,99' : '$8.99', period: isTurkish ? '/ay' : '/mo', monthly: null, badge: null },
-  yearly: { price: isTurkish ? '₺799,99' : '$59.99', period: isTurkish ? '/yıl' : '/yr', monthly: isTurkish ? '₺66,67/ay' : '$4.99/mo', badge: isTurkish ? '%33 İndirim' : '44% Off' },
+  yearly: { price: isTurkish ? '₺799,99' : '$59.99', period: isTurkish ? '/yıl' : '/yr', badge: isTurkish ? '%33 İndirim' : '44% Off' },
 };
 
 function getLocalizedPrice(sub: any, fallback: string): string {
@@ -64,20 +64,16 @@ function getLocalizedPrice(sub: any, fallback: string): string {
   return fallback;
 }
 
-function getYearlyMonthly(sub: any, fallback: string): string {
-  if (!sub) return fallback;
-
-  // localizedPrice'dan sayisal degeri cikar (ornegin "$59.99" -> 59.99, "₺799,99" -> 799.99)
-  const displayPrice = sub.localizedPrice || String(sub.price);
-  if (!displayPrice) return fallback;
-
-  const cleaned = String(displayPrice).replace(/[^\d.,]/g, '').replace(',', '.');
+function computeMonthlyFromPrice(yearlyPriceStr: string): string {
+  // Gosterilen yillik fiyat metninden aylik kirilimi hesapla
+  // Ornek: "$59.99" -> "$4.99/mo", "₺799,99" -> "₺66.66/ay"
+  const cleaned = yearlyPriceStr.replace(/[^\d.,]/g, '').replace(',', '.');
   const raw = parseFloat(cleaned);
-  if (isNaN(raw) || raw <= 0) return fallback;
+  if (isNaN(raw) || raw <= 0) return '';
 
-  // Para birimi sembolunu localizedPrice'dan al
-  const symbolMatch = String(displayPrice).match(/[^\d\s.,]+/);
-  const symbol = symbolMatch ? symbolMatch[0] : (sub.currency === 'TRY' ? '₺' : '$');
+  // Para birimi sembolunu ayni fiyat stringinden al
+  const symbolMatch = yearlyPriceStr.match(/[^\d\s.,]+/);
+  const symbol = symbolMatch ? symbolMatch[0] : '';
 
   const monthly = (Math.floor((raw / 12) * 100) / 100).toFixed(2);
   const suffix = isTurkish ? '/ay' : '/mo';
@@ -203,6 +199,8 @@ export default function PaywallScreen() {
   const isActivePlan = (sku: string) => plan === 'premium' && activeSku === sku;
   const hasActivePlan = plan === 'premium' && activeSku !== null;
 
+  const yearlyPrice = getLocalizedPrice(subYearly, FALLBACK.yearly.price);
+
   const PLANS = [
     {
       id: 'monthly', sku: SKU_MONTHLY,
@@ -216,9 +214,9 @@ export default function PaywallScreen() {
     {
       id: 'yearly', sku: SKU_YEARLY,
       label: isTurkish ? 'Yıllık' : 'Yearly',
-      price: getLocalizedPrice(subYearly, FALLBACK.yearly.price),
+      price: yearlyPrice,
       period: FALLBACK.yearly.period,
-      monthly: getYearlyMonthly(subYearly, FALLBACK.yearly.monthly!),
+      monthly: computeMonthlyFromPrice(yearlyPrice),
       badge: FALLBACK.yearly.badge,
       recommended: true,
     },
