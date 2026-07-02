@@ -55,7 +55,7 @@ const FEATURES = [
 
 const FALLBACK = {
   monthly: { price: isTurkish ? '₺99,99' : '$8.99', period: isTurkish ? '/ay' : '/mo', monthly: null, badge: null },
-  yearly: { price: isTurkish ? '₺799,99' : '$59.99', period: isTurkish ? '/yıl' : '/yr', monthly: isTurkish ? '₺66,7/ay' : '$5.00/mo', badge: isTurkish ? '%33 İndirim' : '44% Off' },
+  yearly: { price: isTurkish ? '₺799,99' : '$59.99', period: isTurkish ? '/yıl' : '/yr', monthly: isTurkish ? '₺66,67/ay' : '$5.00/mo', badge: isTurkish ? '%33 İndirim' : '44% Off' },
 };
 
 function getLocalizedPrice(sub: any, fallback: string): string {
