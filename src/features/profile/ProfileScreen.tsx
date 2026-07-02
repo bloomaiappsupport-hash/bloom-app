@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, Animated, Linking, Modal,
-  TextInput, KeyboardAvoidingView, Platform, ActivityIndicator,
+  TextInput, KeyboardAvoidingView, Platform, ActivityIndicator, Alert,
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -431,7 +431,7 @@ export default function ProfileScreen() {
   const { language, setLanguage } = useLanguageStore();
   const { profile, plan, reset } = useAuthStore();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const { habits } = useHabitStore();
+  const { habits, clear: clearHabits } = useHabitStore();
   const [notificationsOn, setNotificationsOn] = useState(true);
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
@@ -507,6 +507,7 @@ export default function ProfileScreen() {
       confirmColor: '#F87171',
       onConfirm: async () => {
         await authService.signOut();
+        clearHabits();
         reset();
       },
     });
@@ -519,8 +520,17 @@ export default function ProfileScreen() {
       confirmText: t('profile.deleteModal.confirm'),
       confirmColor: '#F87171',
       onConfirm: async () => {
-        await authService.signOut();
-        reset();
+        try {
+          const { error } = await authService.deleteAccount();
+          if (error) throw error;
+          await authService.signOut();
+          reset();
+        } catch (err: any) {
+          Alert.alert(
+            t('common.error') || 'Hata',
+            err.message || (language === 'tr' ? 'Hesap silinemedi. Lütfen tekrar deneyin.' : 'Could not delete account. Please try again.')
+          );
+        }
       },
     });
   };

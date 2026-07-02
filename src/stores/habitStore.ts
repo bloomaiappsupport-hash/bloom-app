@@ -18,6 +18,7 @@ interface HabitState {
   useShield: (habitId: string) => Streak | null;
   isCompletedToday: (habitId: string) => boolean;
   getTodayProgress: () => { completed: number; total: number };
+  clear: () => void;
 }
 
 export const useHabitStore = create<HabitState>((set, get) => ({
@@ -26,6 +27,7 @@ export const useHabitStore = create<HabitState>((set, get) => ({
   streaks: {},
   isLoadingData: true,
   setLoadingData: (isLoadingData) => set({ isLoadingData }),
+  clear: () => set({ habits: [], todayCompletions: [], streaks: {} }),
 
   setHabits: (habits) => set({ habits }),
   addHabit: (habit) => set((s) => ({ habits: [...s.habits, habit] })),

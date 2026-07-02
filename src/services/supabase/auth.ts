@@ -67,4 +67,6 @@ export const authService = {
 
   updatePassword: (newPassword: string) =>
     supabase.auth.updateUser({ password: newPassword }),
+
+  deleteAccount: () => supabase.rpc('delete_user_account'),
 };
