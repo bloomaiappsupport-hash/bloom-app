@@ -22,6 +22,7 @@ import {
   HabitIcon, IcFlame, IcSparkle,
   HABIT_ICON_KEYS, HabitIconKey,
 } from '../../components/habits/HabitIcons';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const { width } = Dimensions.get('window');
 
@@ -322,7 +323,7 @@ function AddHabitModal({ visible, onClose }: { visible: boolean; onClose: () => 
       frequency_days: frequency === 'daily' ? [0, 1, 2, 3, 4, 5, 6] : [1, 3, 5],
       reminder_time,
     });
-    if (error) { Alert.alert(t('habits.error'), error.message); return; }
+    if (error) { Alert.alert(t('habits.error'), getErrorMessage(error, t)); return; }
     if (data) {
       addHabit(data);
       if (reminderEnabled) {
@@ -510,7 +511,7 @@ function HabitEditSheet({ habit, onClose }: { habit: Habit | null; onClose: () =
       reminder_time,
     };
     const { error } = await habitsService.updateHabit(habit.id, updates);
-    if (error) { Alert.alert(t('habits.error'), error.message); return; }
+    if (error) { Alert.alert(t('habits.error'), getErrorMessage(error, t)); return; }
     updateHabit(habit.id, updates);
     cancelHabitNotification(habit.id);
     if (reminderEnabled) {
@@ -796,7 +797,7 @@ function AddStackModal({ visible, onClose, habits }: {
       habit_ids: selected,
       time_of_day: timeOfDay,
     });
-    if (error) { Alert.alert(t('habits.error'), error.message); return; }
+    if (error) { Alert.alert(t('habits.error'), getErrorMessage(error, t)); return; }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setName(''); setSelected([]); setTimeOfDay('morning');
     onClose();

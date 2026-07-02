@@ -15,6 +15,7 @@ import { colors, typography, spacing, radius } from '../../theme';
 import { authService } from '../../services/supabase';
 import { GradientButton } from '../../components/common';
 import BloomLogo from '../../components/common/BloomLogo';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 type Nav = CompositeNavigationProp<
   StackNavigationProp<AuthStackParamList, 'Login'>,
@@ -56,7 +57,28 @@ export default function LoginScreen() {
     setLoading(true);
     const { error } = await authService.signInWithEmail(email.trim(), password);
     setLoading(false);
-    if (error) Alert.alert(t('auth.loginFailed'), error.message);
+    if (error) Alert.alert(t('auth.loginFailed'), getErrorMessage(error, t));
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await authService.signInWithGoogle();
+    } catch (e: any) {
+      const { statusCodes } = await import('@react-native-google-signin/google-signin');
+      if (e?.code !== statusCodes.SIGN_IN_CANCELLED) {
+        Alert.alert(t('auth.loginFailed'), getErrorMessage(e, t));
+      }
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    try {
+      await authService.signInWithApple();
+    } catch (e: any) {
+      if (e?.code !== 'ERR_CANCELED') {
+        Alert.alert(t('auth.loginFailed'), getErrorMessage(e, t));
+      }
+    }
   };
 
   return (
@@ -129,13 +151,13 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.socialArea}>
-            <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8}>
+            <TouchableOpacity style={styles.socialBtn} activeOpacity={0.8} onPress={handleGoogleSignIn}>
               <GoogleIcon size={20} />
               <Text style={styles.socialBtnText}>{t('auth.continueWithGoogle')}</Text>
             </TouchableOpacity>
 
             {Platform.OS === 'ios' && (
-              <TouchableOpacity style={[styles.socialBtn, styles.appleBtnStyle]} activeOpacity={0.8}>
+              <TouchableOpacity style={[styles.socialBtn, styles.appleBtnStyle]} activeOpacity={0.8} onPress={handleAppleSignIn}>
                 <AppleIcon size={20} color="#fff" />
                 <Text style={[styles.socialBtnText, { color: '#fff' }]}>{t('auth.continueWithApple')}</Text>
               </TouchableOpacity>

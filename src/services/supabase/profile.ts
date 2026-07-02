@@ -18,7 +18,10 @@ export const profileService = {
     supabase.from('user_preferences').upsert(prefs).select().single(),
 
   getSubscription: (userId: string) =>
-    supabase.from('subscriptions').select('*').eq('user_id', userId).single(),
+    // maybeSingle: kayıt yoksa hata DEĞİL, data=null döner. Böylece "kayıt yok"
+    // durumu ağ hatasından ayrılır ve App.tsx kullanıcıyı doğru şekilde free yapar
+    // (eski yerel SecureStore kaydı yüzünden hayalet premium oluşmaz).
+    supabase.from('subscriptions').select('*').eq('user_id', userId).maybeSingle(),
 
   isPremium: async (userId: string): Promise<boolean> => {
     const { data } = await supabase

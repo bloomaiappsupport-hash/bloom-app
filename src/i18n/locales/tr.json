@@ -11,6 +11,7 @@
     "next": "İleri",
     "loading": "Yükleniyor...",
     "error": "Bir hata oluştu",
+    "networkError": "İnternet bağlantınızı kontrol edin.",
     "retry": "Tekrar Dene",
     "yes": "Evet",
     "no": "Hayır",
@@ -51,7 +52,13 @@
     "backBtn": "← Geri",
     "sentTitle": "Gönderildi!",
     "sentMessage": "{{email}} adresine sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et.",
-    "backToLogin": "Giriş Ekranına Dön"
+    "signUpSentMessage": "{{email}} adresine doğrulama bağlantısı gönderdik. Gelen kutunu kontrol et.",
+    "backToLogin": "Giriş Ekranına Dön",
+    "verifyTitle": "Mailinizi Doğrulayın",
+    "verifySubtitle": "{{email}} adresine bir doğrulama bağlantısı gönderdik. Bağlantıya tıklayarak hesabınızı aktif edin.",
+    "verifyResend": "Tekrar Gönder",
+    "verifyResendSuccess": "Doğrulama maili tekrar gönderildi.",
+    "verifyBackToLogin": "Giriş Sayfasına Dön"
   },
   "password": {
     "veryWeak": "Çok zayıf",
@@ -96,7 +103,57 @@
     "q5": "Motivasyonun nasıl çalışır?",
     "q6": "Hangi alan sana en çok çekici geliyor?",
     "q7": "Hatırlatıcılar konusunda nasılsın?",
-    "q8": "Kendini nasıl tanımlarsın?"
+    "q8": "Kendini nasıl tanımlarsın?",
+    "options": {
+      "energy_time": {
+        "early_morning": "Sabah erken",
+        "morning": "Sabah",
+        "afternoon": "Öğleden sonra",
+        "night": "Gece"
+      },
+      "goal": {
+        "fitness": "Sağlık & Fitness",
+        "mental": "Zihinsel Sağlık",
+        "career": "Kariyer & Üretkenlik",
+        "growth": "Kişisel Gelişim"
+      },
+      "barrier": {
+        "motivation": "Motivasyon kaybı",
+        "time": "Zaman yok",
+        "forgetting": "Unutuyorum",
+        "difficulty": "Çok zor başlıyor"
+      },
+      "habit_count": {
+        "low": "1–2  Kolay",
+        "mid": "3–4  Orta",
+        "high": "5–6  Yoğun",
+        "flexible": "Esnek"
+      },
+      "motivation_type": {
+        "rewards": "Ödüller & Rozetler",
+        "progress": "İlerleme görme",
+        "accountability": "Hesap verebilirlik",
+        "intrinsic": "İç motivasyon"
+      },
+      "focus_area": {
+        "physical": "Fiziksel sağlık",
+        "mindfulness": "Meditasyon",
+        "learning": "Okuma & Öğrenme",
+        "sleep": "Uyku & Dinlenme"
+      },
+      "reminder_style": {
+        "frequent": "Çok hatırlat",
+        "once": "Günde bir kez",
+        "missed_only": "Sadece kaçırınca",
+        "none": "Hiç istemem"
+      },
+      "self_type": {
+        "planner": "Planlayıcı",
+        "spontaneous": "Spontane",
+        "perfectionist": "Mükemmeliyetçi",
+        "pragmatic": "Pragmatik"
+      }
+    }
   },
   "home": {
     "greeting_morning": "Günaydın",
@@ -281,6 +338,10 @@
     "daySeries": "Gün Serisi",
     "freePlan": "Ücretsiz Plan",
     "premiumSub": "Sınırsız AI koçluk, streak kalkanları ve detaylı Habit DNA",
+    "planYearly": "Yıllık Plan",
+    "planMonthly": "Aylık Plan",
+    "planActive": "aktif",
+    "viewPlan": "Planımı Görüntüle",
     "passwordModal": {
       "title": "Şifremi Değiştir",
       "newPassword": "Yeni şifre",

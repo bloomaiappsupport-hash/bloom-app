@@ -46,7 +46,7 @@ const isTurkish = getIsTurkish();
 
 const FEATURES = [
   { label: 'Sınırsız alışkanlık', free: '5 alışkanlık', premium: 'Sınırsız' },
-  { label: 'AI Koç mesajı', free: '10/gün', premium: 'Sınırsız' },
+  { label: 'AI Koç mesajı', free: '3/gün', premium: 'Sınırsız' },
   { label: 'Streak Kalkanı', free: '—', premium: '2/ay' },
   { label: 'Habit DNA raporu', free: 'Temel', premium: 'Detaylı + Paylaşım' },
   { label: 'Haftalık AI raporu', free: '—', premium: 'Her hafta' },
@@ -116,20 +116,31 @@ export default function PaywallScreen() {
         setLoading(false);
         return;
       }
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const expiresAt = new Date();
-        if (purchase.productId === SKU_YEARLY) {
-          expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-        } else {
-          expiresAt.setMonth(expiresAt.getMonth() + 1);
-        }
-        await supabase.from('subscriptions').upsert({
-          user_id: user.id,
-          plan: 'premium',
-          expires_at: expiresAt.toISOString(),
-        });
+      // Premium'u İSTEMCİ yazmaz. Apple imzalı fişi sunucuya gönderip
+      // doğrulatıyoruz; tabloya yalnızca doğrulanan sonucu sunucu yazar.
+      const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-purchase', {
+        body: {
+          platform: Platform.OS,
+          purchaseToken:
+            (purchase as any).purchaseToken ??
+            (purchase as any).jwsRepresentationIos ??
+            (purchase as any).jwsRepresentation,
+        },
+      });
+
+      if (verifyError || verifyData?.plan !== 'premium') {
+        // Doğrulama başarısız → premium VERME.
+        setLoading(false);
+        Alert.alert(
+          isTurkish ? 'Doğrulama başarısız' : 'Verification failed',
+          isTurkish
+            ? 'Satın alman doğrulanamadı. Ödeme alındıysa uygulamayı yeniden başlatıp "Satın alımları geri yükle"yi dene.'
+            : 'Your purchase could not be verified. If you were charged, restart the app and use "Restore purchases".',
+        );
+        return;
       }
+
+      // Sunucu premium'u onayladı ve tabloya yazdı. İstemci sadece UX için önbelleğe alır.
       await SecureStore.setItemAsync(ACTIVE_PLAN_KEY, purchase.productId);
       setActiveSku(purchase.productId);
       useAuthStore.getState().setPlan('premium');
@@ -137,7 +148,10 @@ export default function PaywallScreen() {
       Alert.alert(
         isTurkish ? 'Başarılı!' : 'Success!',
         isTurkish ? 'Premium üyeliğin aktif edildi.' : 'Your premium membership is now active.',
-        [{ text: isTurkish ? 'Harika!' : 'Great!', onPress: () => navigation.goBack() }],
+        [{ text: isTurkish ? 'Harika!' : 'Great!', onPress: () => {
+          if (navigation.canGoBack()) navigation.goBack();
+          else navigation.navigate('Main');
+        } }],
       );
     } catch (e) {
       setLoading(false);
@@ -148,7 +162,12 @@ export default function PaywallScreen() {
     onPurchaseSuccess: handlePurchaseSuccess,
     onPurchaseError: (error) => {
       setLoading(false);
-      if ((error as any).code !== 'E_USER_CANCELLED') {
+      // Kullanıcı vazgeçtiyse hata gösterme. v15 iptal kodu/mesajı farklı
+      // biçimlerde gelebildiği için hepsini yakalıyoruz.
+      const code = String((error as any)?.code ?? '').toLowerCase();
+      const msg = String(error?.message ?? '').toLowerCase();
+      const isCancel = code.includes('cancel') || msg.includes('cancel');
+      if (!isCancel) {
         Alert.alert(
           isTurkish ? 'Hata' : 'Error',
           error.message ?? (isTurkish ? 'Satın alma başarısız.' : 'Purchase failed.'),
@@ -163,11 +182,12 @@ export default function PaywallScreen() {
     }
   }, [connected, fetchProducts]);
 
+  const { plan } = useAuthStore();
   const subMonthly = subscriptions.find(s => s.id === SKU_MONTHLY);
   const subYearly = subscriptions.find(s => s.id === SKU_YEARLY);
 
-  const isActivePlan = (sku: string) => activeSku === sku;
-  const hasActivePlan = activeSku !== null;
+  const isActivePlan = (sku: string) => plan === 'premium' && activeSku === sku;
+  const hasActivePlan = plan === 'premium' && activeSku !== null;
 
   const PLANS = [
     {
@@ -211,11 +231,31 @@ export default function PaywallScreen() {
   const handleRestore = async () => {
     try {
       setLoading(true);
-      await getAvailablePurchases();
+      const purchases = await getAvailablePurchases();
+      let restored = false;
+      for (const p of (purchases ?? [])) {
+        const { data } = await supabase.functions.invoke('verify-purchase', {
+          body: {
+            platform: Platform.OS,
+            purchaseToken:
+              (p as any).purchaseToken ??
+              (p as any).jwsRepresentationIos ??
+              (p as any).jwsRepresentation,
+          },
+        });
+        if (data?.plan === 'premium') {
+          await SecureStore.setItemAsync(ACTIVE_PLAN_KEY, p.productId);
+          setActiveSku(p.productId);
+          useAuthStore.getState().setPlan('premium');
+          restored = true;
+        }
+      }
       setLoading(false);
       Alert.alert(
         isTurkish ? 'Geri Yükleme' : 'Restore',
-        isTurkish ? 'Satın alımların kontrol edildi.' : 'Your purchases have been checked.',
+        restored
+          ? (isTurkish ? 'Premium üyeliğin geri yüklendi.' : 'Your premium membership has been restored.')
+          : (isTurkish ? 'Aktif bir abonelik bulunamadı.' : 'No active subscription found.'),
       );
     } catch {
       setLoading(false);
@@ -305,9 +345,7 @@ export default function PaywallScreen() {
                   <Text style={styles.planPrice}>{p.price}</Text>
                   <Text style={styles.planPeriod}>{p.period}</Text>
                 </View>
-                {p.monthly
-                  ? <Text style={styles.planMonthly}>{p.monthly}</Text>
-                  : <View style={{ height: 16 }} />}
+                {p.monthly && <Text style={styles.planMonthly}>{p.monthly}</Text>}
               </TouchableOpacity>
             ))}
           </View>
@@ -406,7 +444,8 @@ function createStyles(colors: ReturnType<typeof useColors>) {
     planRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.xl },
     planCard: {
       flex: 1, borderRadius: radius.xl, borderWidth: 2, borderColor: colors.border,
-      padding: spacing.md, alignItems: 'center', overflow: 'hidden', gap: 4,
+      padding: spacing.md, alignItems: 'center', justifyContent: 'center',
+      overflow: 'hidden', gap: 4, minHeight: 130,
     },
     planCardSelected: { borderColor: colors.primary },
     planCardActive: {},
@@ -417,7 +456,7 @@ function createStyles(colors: ReturnType<typeof useColors>) {
     },
     planBadgeActive: { backgroundColor: '#15803d' },
     planBadgeText: { color: '#fff', fontWeight: '700', fontSize: 11, letterSpacing: 0.2 },
-    planLabel: { ...typography.captionBold, color: colors.textSecondary, letterSpacing: 0.5 },
+    planLabel: { fontSize: 15, fontWeight: '700', color: colors.textSecondary, letterSpacing: 0.8, textTransform: 'uppercase' },
     planPriceRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 2 },
     planPrice: { ...typography.h2, color: colors.textPrimary },
     planPeriod: { ...typography.small, color: colors.textMuted, marginBottom: 4 },

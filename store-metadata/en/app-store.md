@@ -37,9 +37,8 @@ Daily habits on one screen. Complete, skip, defer — done in seconds.
 • Unlimited history
 
 **Subscription:**
-• Monthly: $2.99/month
-• Yearly: $19.99/year (save 44%)
-• 3-day free trial (yearly plan)
+• Monthly: $8.99/month
+• Yearly: $59.99/year (save 44%)
 
 Payment charged to iTunes Account at confirmation. Subscription automatically renews unless cancelled at least 24 hours before the end of the current period. Manage in iTunes Account Settings.
 

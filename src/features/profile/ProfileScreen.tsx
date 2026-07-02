@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, TouchableOpacity, Animated, Linking, Modal,
   TextInput, KeyboardAvoidingView, Platform, ActivityIndicator,
 } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Circle, Rect, Polyline, Line } from 'react-native-svg';
 import * as Notifications from 'expo-notifications';
@@ -434,7 +435,22 @@ export default function ProfileScreen() {
   const [notificationsOn, setNotificationsOn] = useState(true);
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [activeSku, setActiveSku] = useState<string | null>(null);
+  const isYearly = activeSku === 'com.barangunduz.bloomhabit.yearly';
+  const isMonthly = activeSku === 'com.barangunduz.bloomhabit.monthly';
+  // Tek doğru kaynak = plan (App.tsx tarafından tablodan + süre kontrolüyle set edilir).
+  // SecureStore SKU'su yalnızca hangi tarife olduğunu ETİKETLEMEK için kullanılır,
+  // premium olup olmadığına karar vermek için DEĞİL (süresi dolmuş "hayalet aktif" olmasın).
   const isPremium = plan === 'premium';
+  const planLabel = !isPremium
+    ? t('profile.freePlan')
+    : isYearly
+      ? t('profile.planYearly')
+      : t('profile.planMonthly');
+
+  useEffect(() => {
+    SecureStore.getItemAsync('bloom_active_plan_sku').then(sku => setActiveSku(sku));
+  }, []);
 
   const showModal = (config: ModalConfig) => setModalConfig(config);
   const closeModal = () => setModalConfig(null);
@@ -526,12 +542,20 @@ export default function ProfileScreen() {
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>{profile?.name || t('profile.title')}</Text>
           {isPremium ? (
-            <LinearGradient colors={[colors.gold, '#FB8500']} style={styles.premiumBadge}>
-              <IcDiamond color="#fff" />
-              <Text style={styles.premiumBadgeText}>PREMIUM</Text>
-            </LinearGradient>
+            <View style={styles.planBadge}>
+              <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
+                <Path
+                  d="M3 18h18M5 18l-2-9 5 4 4-7 4 7 5-4-2 9H5z"
+                  stroke={isYearly ? '#FFB703' : '#A78BFA'}
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              </Svg>
+              <Text style={[styles.planBadgeText, { color: isYearly ? '#FFB703' : '#A78BFA' }]}>{planLabel}</Text>
+            </View>
           ) : (
-            <Text style={styles.freePlanText}>{t('profile.freePlan')}</Text>
+            <Text style={styles.freePlanText}>{planLabel}</Text>
           )}
         </View>
       </View>
@@ -552,36 +576,49 @@ export default function ProfileScreen() {
         </GlassCard>
       </View>
 
-      {/* Premium CTA */}
-      {!isPremium && (
-        <LinearGradient
-          colors={['#1E0A4A', '#150836', '#0D0527']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.premiumCta}
-        >
-          <View style={styles.premiumCtaHeader}>
-            <Svg width={28} height={28} viewBox="0 0 24 24" fill="none">
-              <Path d="M2 19h20v2H2v-2z" fill="#A78BFA" />
-              <Path d="M2 19l2.5-9 4.5 4L12 4l3 10 4.5-4L22 19H2z" fill="#7C3AED" stroke="#A78BFA" strokeWidth="1.2" strokeLinejoin="round" />
-              <Circle cx="2.5" cy="10" r="1.5" fill="#C4B5FD" />
-              <Circle cx="12" cy="4" r="1.5" fill="#C4B5FD" />
-              <Circle cx="21.5" cy="10" r="1.5" fill="#C4B5FD" />
-            </Svg>
-            <View style={styles.premiumCtaBadge}>
-              <Text style={styles.premiumCtaBadgeText}>PREMIUM</Text>
-            </View>
+      {/* Premium Card */}
+      <LinearGradient
+        colors={['#1E0A4A', '#150836', '#0D0527']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.premiumCta}
+      >
+        <View style={styles.premiumCtaHeader}>
+          <Svg width={28} height={28} viewBox="0 0 24 24" fill="none">
+            <Path d="M2 19h20v2H2v-2z" fill="#A78BFA" />
+            <Path d="M2 19l2.5-9 4.5 4L12 4l3 10 4.5-4L22 19H2z" fill="#7C3AED" stroke="#A78BFA" strokeWidth="1.2" strokeLinejoin="round" />
+            <Circle cx="2.5" cy="10" r="1.5" fill="#C4B5FD" />
+            <Circle cx="12" cy="4" r="1.5" fill="#C4B5FD" />
+            <Circle cx="21.5" cy="10" r="1.5" fill="#C4B5FD" />
+          </Svg>
+          <View style={styles.premiumCtaBadge}>
+            <Text style={styles.premiumCtaBadgeText}>{isPremium ? 'AKTİF' : 'PREMIUM'}</Text>
           </View>
-          <Text style={styles.premiumCtaTitle}>BLOOM Premium</Text>
-          <Text style={styles.premiumCtaSub}>{t('profile.premiumSub')}</Text>
-          <GradientButton
-            label={t('profile.goPremium')}
-            onPress={() => navigation.navigate('Paywall')}
-            gradient={['#8B5CF6', '#6D28D9', '#4C1D95']}
-            style={styles.premiumBtn}
-          />
-        </LinearGradient>
-      )}
+        </View>
+        <Text style={styles.premiumCtaTitle}>BLOOM Premium</Text>
+        {isPremium ? (
+          <>
+            <Text style={styles.premiumCtaSub}>{planLabel} {t('profile.planActive')}</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Paywall')}
+              style={styles.manageSubBtn}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.manageSubText}>{t('profile.viewPlan')}</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <Text style={styles.premiumCtaSub}>{t('profile.premiumSub')}</Text>
+            <GradientButton
+              label={t('profile.goPremium')}
+              onPress={() => navigation.navigate('Paywall')}
+              gradient={['#8B5CF6', '#6D28D9', '#4C1D95']}
+              style={styles.premiumBtn}
+            />
+          </>
+        )}
+      </LinearGradient>
 
       {/* Tercihler */}
       <View style={styles.section}>
@@ -603,14 +640,14 @@ export default function ProfileScreen() {
                 <TouchableOpacity
                   onPress={() => setLanguage('tr')}
                   style={[styles.langBtn, language === 'tr' && styles.langBtnActive]}
-                  activeOpacity={0.8}
+                  activeOpacity={0.7}
                 >
                   <Text style={[styles.langBtnText, language === 'tr' && styles.langBtnTextActive]}>TR</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => setLanguage('en')}
                   style={[styles.langBtn, language === 'en' && styles.langBtnActive]}
-                  activeOpacity={0.8}
+                  activeOpacity={0.7}
                 >
                   <Text style={[styles.langBtnText, language === 'en' && styles.langBtnTextActive]}>EN</Text>
                 </TouchableOpacity>
@@ -665,9 +702,11 @@ function createStyles(colors: ReturnType<typeof useColors>) {
     avatarText: { color: '#fff', fontSize: 26, fontWeight: '800' },
     profileInfo: { gap: spacing.xs },
     profileName: { ...typography.h2, color: colors.textPrimary },
-    premiumBadge: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: spacing.md, paddingVertical: 4, borderRadius: radius.full },
-    premiumBadgeText: { ...typography.captionBold, color: '#fff', letterSpacing: 1 },
-    freePlanText: { ...typography.caption, color: colors.textMuted },
+    planBadge: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.full, borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)', backgroundColor: 'rgba(139,92,246,0.08)' },
+    planBadgeText: { fontSize: 12, fontWeight: '600', letterSpacing: 0.3 },
+    freePlanText: { fontSize: 13, fontWeight: '500', color: colors.textMuted },
+    manageSubBtn: { marginTop: spacing.sm, paddingVertical: 10, borderRadius: radius.lg, borderWidth: 1, borderColor: 'rgba(167,139,250,0.3)', alignItems: 'center', backgroundColor: 'rgba(139,92,246,0.08)' },
+    manageSubText: { ...typography.captionBold, color: '#A78BFA', letterSpacing: 0.5 },
 
     statsRow: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl },
     statCard: { flex: 1, padding: spacing.md, alignItems: 'center', gap: 4 },

@@ -7,6 +7,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 import { RootStackParamList } from '../../navigation/types';
 import { colors, typography, spacing, radius } from '../../theme';
 import {
@@ -22,42 +24,12 @@ type Nav = StackNavigationProp<RootStackParamList, 'Onboarding'>;
 
 const ILLUS_SIZE = Math.min(230, height * 0.27);
 
-const SLIDES = [
-  {
-    key: '1',
-    title: 'Alışkanlıkların\nÇiçekleniyor',
-    subtitle: 'Her küçük adım seni büyütür. BLOOM ile alışkanlıklarını bir yaşam tarzına dönüştür.',
-    accentColor: colors.primary,
-    Illustration: IllustrationGrowth,
-  },
-  {
-    key: '2',
-    title: 'Seni Tanıyan\nBir Koç',
-    subtitle: 'Sadece takip değil — gerçek koçluk. Engellerin, örüntülerin ve motivasyonun analiz edilir.',
-    accentColor: colors.secondary,
-    Illustration: IllustrationAI,
-  },
-  {
-    key: '3',
-    title: 'Ritual Stack\'ler\nYarat',
-    subtitle: 'Alışkanlıkları birbirine zincirle. Sabah ritüelin günü nasıl başlattığını hissedeceksin.',
-    accentColor: colors.accent,
-    Illustration: IllustrationStack,
-  },
-  {
-    key: '4',
-    title: 'Habit DNA\'nı\nKeşfet',
-    subtitle: 'Benzersiz alışkanlık profilin. Güçlü ve gelişime açık yönlerin görünür hale gelir.',
-    accentColor: colors.gold,
-    Illustration: IllustrationDNA,
-  },
-  {
-    key: '5',
-    title: 'Hazır\nmısın?',
-    subtitle: '8 hızlı soruyla sana özel bir başlangıç hazırlıyoruz. Sadece 60 saniye sürer.',
-    accentColor: colors.primaryGlow,
-    Illustration: IllustrationReady,
-  },
+const SLIDE_KEYS = [
+  { key: '1', tKey: 'onboarding.step1', accentColor: colors.primary,     Illustration: IllustrationGrowth },
+  { key: '2', tKey: 'onboarding.step2', accentColor: colors.secondary,   Illustration: IllustrationAI    },
+  { key: '3', tKey: 'onboarding.step3', accentColor: colors.accent,      Illustration: IllustrationStack },
+  { key: '4', tKey: 'onboarding.step4', accentColor: colors.gold,        Illustration: IllustrationDNA   },
+  { key: '5', tKey: 'onboarding.step5', accentColor: colors.primaryGlow, Illustration: IllustrationReady },
 ];
 
 function Slide({
@@ -65,10 +37,11 @@ function Slide({
   index,
   scrollX,
 }: {
-  item: typeof SLIDES[0];
+  item: typeof SLIDE_KEYS[0];
   index: number;
   scrollX: Animated.Value;
 }) {
+  const { t } = useTranslation();
   const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
   const illustScale = scrollX.interpolate({ inputRange, outputRange: [0.88, 1, 0.88] });
   const illustOpacity = scrollX.interpolate({ inputRange, outputRange: [0.35, 1, 0.35] });
@@ -78,19 +51,17 @@ function Slide({
 
   return (
     <View style={styles.slide}>
-      {/* ── Illustration section: illustration floats near the bottom of its flex area ── */}
       <View style={styles.illustSection}>
         <Animated.View style={{ opacity: illustOpacity, transform: [{ scale: illustScale }] }}>
           <Illustration size={ILLUS_SIZE} />
         </Animated.View>
       </View>
 
-      {/* ── Text section: starts right below illustration ── */}
       <Animated.View
         style={[styles.textSection, { opacity: textOpacity, transform: [{ translateY: textTranslateY }] }]}
       >
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.subtitle}>{item.subtitle}</Text>
+        <Text style={styles.title}>{t(`${item.tKey}.title`)}</Text>
+        <Text style={styles.subtitle}>{t(`${item.tKey}.subtitle`)}</Text>
       </Animated.View>
     </View>
   );
@@ -98,9 +69,17 @@ function Slide({
 
 export default function OnboardingScreen() {
   const navigation = useNavigation<Nav>();
+  const { t, i18n: i18nInstance } = useTranslation();
   const flatListRef = useRef<FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [lang, setLang] = useState(i18nInstance.language === 'tr' ? 'tr' : 'en');
+
+  const toggleLanguage = () => {
+    const next = lang === 'tr' ? 'en' : 'tr';
+    i18n.changeLanguage(next);
+    setLang(next);
+  };
 
   const onViewableItemsChanged = useRef(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
@@ -109,7 +88,7 @@ export default function OnboardingScreen() {
   ).current;
 
   const goNext = () => {
-    if (currentIndex < SLIDES.length - 1) {
+    if (currentIndex < SLIDE_KEYS.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true });
     } else {
       navigation.replace('Assessment');
@@ -122,6 +101,17 @@ export default function OnboardingScreen() {
         colors={['#0D0622', '#080812']}
         style={StyleSheet.absoluteFill}
       />
+
+      {/* Language toggle — top-left, hides when back button appears */}
+      {currentIndex === 0 && (
+        <TouchableOpacity
+          onPress={toggleLanguage}
+          style={styles.langBtn}
+          hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+        >
+          <Text style={styles.langBtnText}>{lang === 'tr' ? 'EN' : 'TR'}</Text>
+        </TouchableOpacity>
+      )}
 
       {/* Back */}
       {currentIndex > 0 && (
@@ -140,13 +130,13 @@ export default function OnboardingScreen() {
         style={styles.skipBtn}
         hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
       >
-        <Text style={styles.skipText}>Atla</Text>
+        <Text style={styles.skipText}>{t('common.skip')}</Text>
       </TouchableOpacity>
 
       {/* Slides */}
       <Animated.FlatList
         ref={flatListRef}
-        data={SLIDES}
+        data={SLIDE_KEYS}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -165,7 +155,7 @@ export default function OnboardingScreen() {
 
       {/* Progress dots */}
       <View style={styles.dotsRow}>
-        {SLIDES.map((_, i) => {
+        {SLIDE_KEYS.map((_, i) => {
           const dotWidth = scrollX.interpolate({
             inputRange: [(i - 1) * width, i * width, (i + 1) * width],
             outputRange: [5, 22, 5],
@@ -194,9 +184,7 @@ export default function OnboardingScreen() {
             end={{ x: 1, y: 1 }}
             style={styles.ctaGradient}
           >
-            <Text style={styles.ctaText}>
-              {currentIndex === SLIDES.length - 1 ? 'Başla' : 'Devam Et'}
-            </Text>
+            <Text style={styles.ctaText}>{t('common.continue')}</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -208,6 +196,25 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.bg,
+  },
+  langBtn: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 56 : 18,
+    left: spacing.xl,
+    zIndex: 10,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  langBtnText: {
+    ...typography.smallMedium,
+    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   backBtn: {
     position: 'absolute',
@@ -239,14 +246,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // Each slide splits into two flex sections
   slide: {
     width,
     flex: 1,
     flexDirection: 'column',
   },
 
-  // TOP 55%: illustration, pushed to bottom of its section via justifyContent
   illustSection: {
     flex: 55,
     alignItems: 'center',
@@ -254,7 +259,6 @@ const styles = StyleSheet.create({
     paddingBottom: spacing['2xl'],
   },
 
-  // BOTTOM 45%: text starts at top with small gap only
   textSection: {
     flex: 45,
     paddingHorizontal: spacing['2xl'],
@@ -278,7 +282,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
   },
 
-  // Dots
   dotsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -292,7 +295,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
 
-  // CTA
   ctaArea: {
     paddingHorizontal: spacing.base,
     paddingBottom: spacing.md,

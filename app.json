@@ -2,6 +2,7 @@
   "expo": {
     "name": "BLOOM",
     "slug": "bloom-habit-coach",
+    "scheme": "bloom",
     "version": "1.0.0",
     "locales": {
       "en": "./locales/en.json",
@@ -22,7 +23,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.barangunduz.bloomhabit",
-      "buildNumber": "11",
+      "buildNumber": "22",
       "requireFullScreen": true,
       "infoPlist": {
         "NSUserNotificationsUsageDescription": "BLOOM seni doğru zamanda hatırlatmak için bildirimlere ihtiyaç duyar.",
@@ -85,7 +86,14 @@
           "backgroundColor": "#080812"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.106125827120-fhloo467hcd66tgmlhnl50g1eeavg6eq"
+        }
+      ]
     ],
     "updates": {
       "fallbackToCacheTimeout": 0,

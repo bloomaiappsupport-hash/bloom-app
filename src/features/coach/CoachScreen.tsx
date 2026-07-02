@@ -21,7 +21,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/types';
 
-const DAILY_FREE_LIMIT = 10;
+const DAILY_FREE_LIMIT = 3;
 
 function MessageBubble({ msg }: { msg: CoachMessage }) {
   const colors = useColors();
@@ -123,7 +123,7 @@ export default function CoachScreen() {
       ];
 
       const { data, error } = await supabase.functions.invoke('chat', {
-        body: { messages: chatMessages, context },
+        body: { messages: chatMessages, context, isPremium: plan === 'premium' },
       });
 
       if (error) throw new Error(error.message);

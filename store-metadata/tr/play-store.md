@@ -36,7 +36,7 @@ BLOOM PREMIUM:
 ✓ Detaylı Habit DNA + paylaşım
 ✓ Sınırsız veri geçmişi
 
-Fiyatlar: ₺79/ay veya ₺599/yıl
+Fiyatlar: ₺99,99/ay veya ₺799,99/yıl
 
 ## Kategori
 Sağlık ve Fitness

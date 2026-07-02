@@ -37,9 +37,8 @@ Günlük alışkanlıklar tek ekranda. Tamamla, sil, ertele — saniyeler içind
 • Sınırsız veri geçmişi
 
 **Abonelik:**
-• Aylık: ₺79/ay
-• Yıllık: ₺599/yıl (%37 tasarruf)
-• 3 günlük ücretsiz deneme (yıllık plan)
+• Aylık: ₺99,99/ay
+• Yıllık: ₺799,99/yıl (%33 tasarruf)
 
 Abonelik iTunes hesabından tahsil edilir. Mevcut dönem bitmeden 24 saat önce iptal edilmezse otomatik yenilenir. iTunes Hesap Ayarları'ndan yönetilebilir.
 

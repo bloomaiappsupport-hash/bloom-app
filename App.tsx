@@ -1,7 +1,8 @@
 import 'react-native-url-polyfill/auto';
 import './src/i18n';
-import React, { useEffect } from 'react';
-import { LogBox } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { LogBox, Linking } from 'react-native';
+import { supabase } from './src/services/supabase/client';
 import { StatusBar } from 'expo-status-bar';
 
 LogBox.ignoreLogs([
@@ -34,6 +35,7 @@ import {
 import * as SplashScreen from 'expo-splash-screen';
 import * as SecureStore from 'expo-secure-store';
 import RootNavigator from './src/navigation/RootNavigator';
+
 import { authService, profileService, habitsService } from './src/services/supabase';
 import { useAuthStore } from './src/stores/authStore';
 import { useHabitStore } from './src/stores/habitStore';
@@ -47,7 +49,29 @@ const queryClient = new QueryClient({
   },
 });
 
-export default function App() {
+const handleAuthDeepLink = async (url: string) => {
+  if (!url.includes('auth/callback')) return;
+
+  // PKCE flow: bloom://auth/callback?code=...
+  const codeMatch = url.match(/[?&]code=([^&]+)/);
+  if (codeMatch) {
+    await supabase.auth.exchangeCodeForSession(decodeURIComponent(codeMatch[1]));
+    return;
+  }
+
+  // Implicit flow: bloom://auth/callback#access_token=...&refresh_token=...
+  const hash = url.split('#')[1];
+  if (hash) {
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get('access_token');
+    const refreshToken = params.get('refresh_token');
+    if (accessToken && refreshToken) {
+      await supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+    }
+  }
+};
+
+function App() {
   const { setSession, setLoading, setProfile, setPlan } = useAuthStore();
   const { setHabits, setTodayCompletions, setStreak, setLoadingData } = useHabitStore();
   const { loadLanguage } = useLanguageStore();
@@ -59,14 +83,31 @@ export default function App() {
     Inter_700Bold,
     Inter_800ExtraBold,
   });
+  const [splashReady, setSplashReady] = useState(false);
 
   useEffect(() => {
     loadLanguage();
   }, []);
 
   useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
+    Linking.getInitialURL().then((url) => { if (url) handleAuthDeepLink(url); });
+    const sub = Linking.addEventListener('url', ({ url }) => handleAuthDeepLink(url));
+    return () => sub.remove();
+  }, []);
+
+  // Hide splash when fonts load, or after 4s max to avoid infinite stuck screen
+  useEffect(() => {
+    if (fontsLoaded) setSplashReady(true);
   }, [fontsLoaded]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setSplashReady(true), 4000);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (splashReady) SplashScreen.hideAsync().catch(() => {});
+  }, [splashReady]);
 
   const loadUserData = async (userId: string) => {
     setLoadingData(true);
@@ -79,12 +120,15 @@ export default function App() {
       SecureStore.getItemAsync('bloom_active_plan_sku'),
     ]);
     if (profileRes.data) setProfile(profileRes.data);
-    // Use Supabase subscription, fall back to SecureStore if Supabase hasn't updated yet
-    if (subscriptionRes.data?.plan) {
-      setPlan(subscriptionRes.data.plan);
-    } else if (localSku) {
-      setPlan('premium');
-    }
+    // Tek doğru kaynak = subscriptions tablosu (süre kontrolüyle).
+    // Yerel SKU (localSku) yalnızca tablo okunamadığında (ağ hatası) veya 
+    // yerel satın alım mevcut olup veritabanı eşleşmediğinde (sandbox testlerinde) premium'u korumak için yedektir.
+    const sub = subscriptionRes.data;
+    const dbActive =
+      sub?.plan === 'premium' &&
+      (!sub.expires_at || new Date(sub.expires_at) > new Date());
+    const active = dbActive || !!localSku;
+    setPlan(active ? 'premium' : 'free');
     if (habitsRes.data) setHabits(habitsRes.data);
     if (completionsRes.data) setTodayCompletions(completionsRes.data);
     if (streaksRes.data) {
@@ -108,7 +152,7 @@ export default function App() {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  if (!fontsLoaded) return null;
+  if (!splashReady) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -121,3 +165,5 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
+
+export default App;

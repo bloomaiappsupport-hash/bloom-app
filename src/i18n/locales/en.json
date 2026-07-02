@@ -11,6 +11,7 @@
     "next": "Next",
     "loading": "Loading...",
     "error": "Something went wrong",
+    "networkError": "Please check your internet connection.",
     "retry": "Retry",
     "yes": "Yes",
     "no": "No",
@@ -51,7 +52,13 @@
     "backBtn": "← Back",
     "sentTitle": "Sent!",
     "sentMessage": "We sent a reset link to {{email}}. Check your inbox.",
-    "backToLogin": "Back to Login"
+    "signUpSentMessage": "We sent a verification link to {{email}}. Check your inbox.",
+    "backToLogin": "Back to Login",
+    "verifyTitle": "Verify Your Email",
+    "verifySubtitle": "We sent a verification link to {{email}}. Click the link to activate your account.",
+    "verifyResend": "Resend Email",
+    "verifyResendSuccess": "Verification email sent again.",
+    "verifyBackToLogin": "Back to Login"
   },
   "password": {
     "veryWeak": "Very weak",
@@ -96,7 +103,57 @@
     "q5": "How does your motivation work?",
     "q6": "Which area interests you most?",
     "q7": "How are you with reminders?",
-    "q8": "How would you describe yourself?"
+    "q8": "How would you describe yourself?",
+    "options": {
+      "energy_time": {
+        "early_morning": "Early Morning",
+        "morning": "Morning",
+        "afternoon": "Afternoon",
+        "night": "Night"
+      },
+      "goal": {
+        "fitness": "Health & Fitness",
+        "mental": "Mental Health",
+        "career": "Career & Productivity",
+        "growth": "Personal Growth"
+      },
+      "barrier": {
+        "motivation": "Loss of Motivation",
+        "time": "No Time",
+        "forgetting": "Forgetting",
+        "difficulty": "Too Hard to Start"
+      },
+      "habit_count": {
+        "low": "1–2  Easy",
+        "mid": "3–4  Medium",
+        "high": "5–6  Intense",
+        "flexible": "Flexible"
+      },
+      "motivation_type": {
+        "rewards": "Rewards & Badges",
+        "progress": "Seeing Progress",
+        "accountability": "Accountability",
+        "intrinsic": "Inner Motivation"
+      },
+      "focus_area": {
+        "physical": "Physical Health",
+        "mindfulness": "Meditation",
+        "learning": "Reading & Learning",
+        "sleep": "Sleep & Rest"
+      },
+      "reminder_style": {
+        "frequent": "Remind Often",
+        "once": "Once a Day",
+        "missed_only": "Only When Missed",
+        "none": "No Reminders"
+      },
+      "self_type": {
+        "planner": "Planner",
+        "spontaneous": "Spontaneous",
+        "perfectionist": "Perfectionist",
+        "pragmatic": "Pragmatic"
+      }
+    }
   },
   "home": {
     "greeting_morning": "Good morning",
@@ -281,6 +338,10 @@
     "daySeries": "Day Streak",
     "freePlan": "Free Plan",
     "premiumSub": "Unlimited AI coaching, streak shields and detailed Habit DNA",
+    "planYearly": "Yearly Plan",
+    "planMonthly": "Monthly Plan",
+    "planActive": "active",
+    "viewPlan": "View My Plan",
     "passwordModal": {
       "title": "Change Password",
       "newPassword": "New password",
