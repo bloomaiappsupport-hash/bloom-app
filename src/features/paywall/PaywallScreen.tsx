@@ -59,7 +59,17 @@ const FALLBACK = {
 };
 
 function getLocalizedPrice(sub: any, fallback: string): string {
-  return sub?.localizedPrice ?? fallback;
+  if (!sub) return fallback;
+  const val = sub.price ?? sub.localizedPrice;
+  if (!val) return fallback;
+
+  // Eğer değer sadece rakam ve nokta/virgülden ibaretse (para birimi sembolü yoksa)
+  const hasSymbol = /[^\d\s.,]/.test(String(val));
+  if (!hasSymbol) {
+    const symbol = sub.currency === 'TRY' ? '₺' : '$';
+    return `${symbol}${val}`;
+  }
+  return String(val);
 }
 
 function getYearlyMonthly(sub: any, fallback: string): string {
@@ -202,8 +212,8 @@ export default function PaywallScreen() {
   }, [connected, fetchProducts]);
 
   const { plan } = useAuthStore();
-  const subMonthly = subscriptions.find(s => s.id === SKU_MONTHLY);
-  const subYearly = subscriptions.find(s => s.id === SKU_YEARLY);
+  const subMonthly = subscriptions.find(s => s.productId === SKU_MONTHLY || s.id === SKU_MONTHLY);
+  const subYearly = subscriptions.find(s => s.productId === SKU_YEARLY || s.id === SKU_YEARLY);
 
   const isActivePlan = (sku: string) => plan === 'premium' && activeSku === sku;
   const hasActivePlan = plan === 'premium' && activeSku !== null;
