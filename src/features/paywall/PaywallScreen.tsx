@@ -60,41 +60,26 @@ const FALLBACK = {
 
 function getLocalizedPrice(sub: any, fallback: string): string {
   if (!sub) return fallback;
-  const val = sub.price ?? sub.localizedPrice;
-  if (!val) return fallback;
-
-  // Eğer değer sadece rakam ve nokta/virgülden ibaretse (para birimi sembolü yoksa)
-  const hasSymbol = /[^\d\s.,]/.test(String(val));
-  if (!hasSymbol) {
-    const symbol = sub.currency === 'TRY' ? '₺' : '$';
-    return `${symbol}${val}`;
-  }
-  return String(val);
+  if (sub.localizedPrice) return sub.localizedPrice;
+  return fallback;
 }
 
 function getYearlyMonthly(sub: any, fallback: string): string {
   if (!sub) return fallback;
-  const priceStr = sub.localizedPrice || sub.price;
-  if (!priceStr) return fallback;
 
-  const cleaned = String(priceStr).replace(/[^\d.,]/g, '').replace(',', '.');
+  // localizedPrice'dan sayisal degeri cikar (ornegin "$59.99" -> 59.99, "₺799,99" -> 799.99)
+  const displayPrice = sub.localizedPrice || String(sub.price);
+  if (!displayPrice) return fallback;
+
+  const cleaned = String(displayPrice).replace(/[^\d.,]/g, '').replace(',', '.');
   const raw = parseFloat(cleaned);
   if (isNaN(raw) || raw <= 0) return fallback;
 
-  const monthly = (raw / 12).toFixed(1);
+  // Para birimi sembolunu localizedPrice'dan al
+  const symbolMatch = String(displayPrice).match(/[^\d\s.,]+/);
+  const symbol = symbolMatch ? symbolMatch[0] : (sub.currency === 'TRY' ? '₺' : '$');
 
-  let symbol = '$';
-  if (String(priceStr).includes('₺') || sub.currency === 'TRY') {
-    symbol = '₺';
-  } else if (String(priceStr).includes('€') || sub.currency === 'EUR') {
-    symbol = '€';
-  } else if (String(priceStr).includes('£') || sub.currency === 'GBP') {
-    symbol = '£';
-  } else {
-    const match = String(priceStr).match(/^[^\d\s]+/);
-    if (match) symbol = match[0];
-  }
-
+  const monthly = (raw / 12).toFixed(2);
   const suffix = isTurkish ? '/ay' : '/mo';
   return `${symbol}${monthly}${suffix}`;
 }
