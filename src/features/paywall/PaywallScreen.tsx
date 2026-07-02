@@ -212,8 +212,8 @@ export default function PaywallScreen() {
   }, [connected, fetchProducts]);
 
   const { plan } = useAuthStore();
-  const subMonthly = subscriptions.find(s => s.productId === SKU_MONTHLY || s.id === SKU_MONTHLY);
-  const subYearly = subscriptions.find(s => s.productId === SKU_YEARLY || s.id === SKU_YEARLY);
+  const subMonthly = subscriptions.find((s: any) => s.productId === SKU_MONTHLY || s.id === SKU_MONTHLY);
+  const subYearly = subscriptions.find((s: any) => s.productId === SKU_YEARLY || s.id === SKU_YEARLY);
 
   const isActivePlan = (sku: string) => plan === 'premium' && activeSku === sku;
   const hasActivePlan = plan === 'premium' && activeSku !== null;
