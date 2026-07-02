@@ -63,13 +63,30 @@ function getLocalizedPrice(sub: any, fallback: string): string {
 }
 
 function getYearlyMonthly(sub: any, fallback: string): string {
-  if (!sub || !sub.price) return fallback;
-  const cleaned = String(sub.price).replace(/[^\d.,]/g, '').replace(',', '.');
+  if (!sub) return fallback;
+  const priceStr = sub.localizedPrice || sub.price;
+  if (!priceStr) return fallback;
+
+  const cleaned = String(priceStr).replace(/[^\d.,]/g, '').replace(',', '.');
   const raw = parseFloat(cleaned);
   if (isNaN(raw) || raw <= 0) return fallback;
+
   const monthly = (raw / 12).toFixed(1);
+
+  let symbol = '$';
+  if (String(priceStr).includes('₺') || sub.currency === 'TRY') {
+    symbol = '₺';
+  } else if (String(priceStr).includes('€') || sub.currency === 'EUR') {
+    symbol = '€';
+  } else if (String(priceStr).includes('£') || sub.currency === 'GBP') {
+    symbol = '£';
+  } else {
+    const match = String(priceStr).match(/^[^\d\s]+/);
+    if (match) symbol = match[0];
+  }
+
   const suffix = isTurkish ? '/ay' : '/mo';
-  return `${sub.currency === 'TRY' ? '₺' : '$'}${monthly}${suffix}`;
+  return `${symbol}${monthly}${suffix}`;
 }
 
 function IcClose({ color = '#fff' }) {
