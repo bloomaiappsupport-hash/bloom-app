@@ -55,7 +55,7 @@ const FEATURES = [
 
 const FALLBACK = {
   monthly: { price: isTurkish ? '₺99,99' : '$8.99', period: isTurkish ? '/ay' : '/mo', monthly: null, badge: null },
-  yearly: { price: isTurkish ? '₺799,99' : '$59.99', period: isTurkish ? '/yıl' : '/yr', monthly: isTurkish ? '₺66,67/ay' : '$5.00/mo', badge: isTurkish ? '%33 İndirim' : '44% Off' },
+  yearly: { price: isTurkish ? '₺799,99' : '$59.99', period: isTurkish ? '/yıl' : '/yr', monthly: isTurkish ? '₺66,67/ay' : '$4.99/mo', badge: isTurkish ? '%33 İndirim' : '44% Off' },
 };
 
 function getLocalizedPrice(sub: any, fallback: string): string {
@@ -79,7 +79,7 @@ function getYearlyMonthly(sub: any, fallback: string): string {
   const symbolMatch = String(displayPrice).match(/[^\d\s.,]+/);
   const symbol = symbolMatch ? symbolMatch[0] : (sub.currency === 'TRY' ? '₺' : '$');
 
-  const monthly = (raw / 12).toFixed(2);
+  const monthly = (Math.floor((raw / 12) * 100) / 100).toFixed(2);
   const suffix = isTurkish ? '/ay' : '/mo';
   return `${symbol}${monthly}${suffix}`;
 }
