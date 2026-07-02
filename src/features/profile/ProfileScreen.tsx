@@ -429,7 +429,7 @@ export default function ProfileScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { t } = useTranslation();
   const { language, setLanguage } = useLanguageStore();
-  const { profile, plan, reset } = useAuthStore();
+  const { profile, plan, user, reset } = useAuthStore();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const { habits, streaks, clear: clearHabits } = useHabitStore();
   const maxStreak = Object.values(streaks).reduce((max, s) => Math.max(max, s.current_streak || 0), 0);
@@ -554,6 +554,7 @@ export default function ProfileScreen() {
         </LinearGradient>
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>{profile?.name || t('profile.title')}</Text>
+          {user?.email && <Text style={styles.profileEmail}>{user.email}</Text>}
           {isPremium ? (
             <View style={styles.planBadge}>
               <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
@@ -715,6 +716,7 @@ function createStyles(colors: ReturnType<typeof useColors>) {
     avatarText: { color: '#fff', fontSize: 26, fontWeight: '800' },
     profileInfo: { gap: spacing.xs },
     profileName: { ...typography.h2, color: colors.textPrimary },
+    profileEmail: { fontSize: 13, color: colors.textMuted, marginTop: -2 },
     planBadge: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 4, borderRadius: radius.full, borderWidth: 1, borderColor: 'rgba(167,139,250,0.25)', backgroundColor: 'rgba(139,92,246,0.08)' },
     planBadgeText: { fontSize: 12, fontWeight: '600', letterSpacing: 0.3 },
     freePlanText: { fontSize: 13, fontWeight: '500', color: colors.textMuted },
