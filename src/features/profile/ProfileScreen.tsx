@@ -431,7 +431,8 @@ export default function ProfileScreen() {
   const { language, setLanguage } = useLanguageStore();
   const { profile, plan, reset } = useAuthStore();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const { habits, clear: clearHabits } = useHabitStore();
+  const { habits, streaks, clear: clearHabits } = useHabitStore();
+  const maxStreak = Object.values(streaks).reduce((max, s) => Math.max(max, s.current_streak || 0), 0);
   const [notificationsOn, setNotificationsOn] = useState(true);
   const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
@@ -583,7 +584,7 @@ export default function ProfileScreen() {
           <Text style={styles.statLabel}>{t('profile.bloomLevel')}</Text>
         </GlassCard>
         <GlassCard style={styles.statCard}>
-          <Text style={styles.statNum}>12</Text>
+          <Text style={styles.statNum}>{maxStreak}</Text>
           <Text style={styles.statLabel}>{t('profile.daySeries')}</Text>
         </GlassCard>
       </View>

@@ -17,7 +17,7 @@ import { GlassCard, GradientButton } from '../../components/common';
 import { CoachMessage } from '../../types';
 import BloomLogo from '../../components/common/BloomLogo';
 import { supabase } from '../../services/supabase/client';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/types';
 
@@ -79,6 +79,29 @@ export default function CoachScreen() {
   const [loading, setLoading] = useState(false);
   const [msgCount, setMsgCount] = useState(0);
   const listRef = useRef<FlatList>(null);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (!user || plan === 'premium' || !isFocused) return;
+
+    const fetchTodayMessageCount = async () => {
+      const startOfDay = new Date();
+      startOfDay.setUTCHours(0, 0, 0, 0);
+
+      const { count, error } = await supabase
+        .from('coach_messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('role', 'user')
+        .gte('created_at', startOfDay.toISOString());
+
+      if (!error && count !== null) {
+        setMsgCount(count);
+      }
+    };
+
+    fetchTodayMessageCount();
+  }, [user, plan, isFocused]);
 
   const isLimited = plan === 'free' && msgCount >= DAILY_FREE_LIMIT;
   const { completed, total } = getTodayProgress();
