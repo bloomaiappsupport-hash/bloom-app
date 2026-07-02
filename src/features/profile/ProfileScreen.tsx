@@ -523,7 +523,9 @@ export default function ProfileScreen() {
         try {
           const { error } = await authService.deleteAccount();
           if (error) throw error;
+          await SecureStore.deleteItemAsync('bloom_active_plan_sku');
           await authService.signOut();
+          clearHabits();
           reset();
         } catch (err: any) {
           Alert.alert(
