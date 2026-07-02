@@ -23,7 +23,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.barangunduz.bloomhabit",
-      "buildNumber": "22",
+      "buildNumber": "23",
       "requireFullScreen": true,
       "infoPlist": {
         "NSUserNotificationsUsageDescription": "BLOOM seni doğru zamanda hatırlatmak için bildirimlere ihtiyaç duyar.",
