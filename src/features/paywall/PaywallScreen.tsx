@@ -63,11 +63,13 @@ function getLocalizedPrice(sub: ProductSubscription | undefined, fallback: strin
 }
 
 function getYearlyMonthly(sub: ProductSubscription | undefined, fallback: string): string {
-  if (!sub) return fallback;
-  const raw = parseFloat(sub.price ?? '0');
-  if (!raw) return fallback;
-  const monthly = (raw / 12).toFixed(2);
-  return `${sub.currency === 'TRY' ? '₺' : '$'}${monthly}/ay`;
+  if (!sub || !sub.price) return fallback;
+  const cleaned = sub.price.replace(/[^\d.,]/g, '').replace(',', '.');
+  const raw = parseFloat(cleaned);
+  if (isNaN(raw) || raw <= 0) return fallback;
+  const monthly = (raw / 12).toFixed(1);
+  const suffix = isTurkish ? '/ay' : '/mo';
+  return `${sub.currency === 'TRY' ? '₺' : '$'}${monthly}${suffix}`;
 }
 
 function IcClose({ color = '#fff' }) {
