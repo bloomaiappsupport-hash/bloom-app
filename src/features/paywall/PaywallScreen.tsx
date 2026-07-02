@@ -58,13 +58,13 @@ const FALLBACK = {
   yearly: { price: isTurkish ? '₺799,99' : '$59.99', period: isTurkish ? '/yıl' : '/yr', monthly: isTurkish ? '₺66,7/ay' : '$5.00/mo', badge: isTurkish ? '%33 İndirim' : '44% Off' },
 };
 
-function getLocalizedPrice(sub: ProductSubscription | undefined, fallback: string): string {
+function getLocalizedPrice(sub: any, fallback: string): string {
   return sub?.localizedPrice ?? fallback;
 }
 
-function getYearlyMonthly(sub: ProductSubscription | undefined, fallback: string): string {
+function getYearlyMonthly(sub: any, fallback: string): string {
   if (!sub || !sub.price) return fallback;
-  const cleaned = sub.price.replace(/[^\d.,]/g, '').replace(',', '.');
+  const cleaned = String(sub.price).replace(/[^\d.,]/g, '').replace(',', '.');
   const raw = parseFloat(cleaned);
   if (isNaN(raw) || raw <= 0) return fallback;
   const monthly = (raw / 12).toFixed(1);
@@ -94,7 +94,7 @@ function IcDiamond({ size = 32, color = '#ffffff' }) {
 export default function PaywallScreen() {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [selectedPlan, setSelectedPlan] = useState<'yearly' | 'monthly'>('yearly');
   const [loading, setLoading] = useState(false);
   const [activeSku, setActiveSku] = useState<string | null>(null);
@@ -235,7 +235,7 @@ export default function PaywallScreen() {
       setLoading(true);
       const purchases = await getAvailablePurchases();
       let restored = false;
-      for (const p of (purchases ?? [])) {
+      for (const p of (purchases ?? []) as any[]) {
         const { data } = await supabase.functions.invoke('verify-purchase', {
           body: {
             platform: Platform.OS,
