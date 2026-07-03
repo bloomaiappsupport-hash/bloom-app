@@ -672,7 +672,7 @@ function HabitEditSheet({ habit, onClose }: { habit: Habit | null; onClose: () =
   );
 }
 
-const FREE_HABIT_LIMIT = 5;
+const FREE_HABIT_LIMIT = 3;
 
 const TIME_LABEL_ICONS: Record<HabitStack['time_of_day'], string> = {
   morning: '🌅',
