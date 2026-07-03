@@ -187,8 +187,8 @@ const styles = StyleSheet.create({
   },
   logoArea: {
     alignItems: 'center',
-    paddingTop: spacing['2xl'],
-    marginBottom: spacing['2xl'],
+    paddingTop: Platform.OS === 'ios' && Platform.isPad ? spacing['2xl'] : spacing.sm,
+    marginBottom: Platform.OS === 'ios' && Platform.isPad ? spacing['2xl'] : spacing.md,
     gap: spacing.sm,
   },
   appName: {
