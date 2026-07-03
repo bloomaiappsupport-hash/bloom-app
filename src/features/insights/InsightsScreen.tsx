@@ -219,7 +219,7 @@ export default function InsightsScreen() {
     const locale = Localization.getLocales()[0];
     const region = locale?.regionCode?.toUpperCase();
     const lang = locale?.languageCode?.toLowerCase();
-    const timezone = locale?.timezone ?? '';
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? '';
     return region === 'TR' || lang === 'tr' || timezone.includes('Istanbul');
   })();
 
