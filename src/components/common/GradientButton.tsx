@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  TouchableOpacity, Text, ViewStyle, TextStyle, StyleSheet, ActivityIndicator,
+  TouchableOpacity, Text, ViewStyle, TextStyle, StyleSheet, ActivityIndicator, StyleProp
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, typography, radius, spacing } from '../../theme';
@@ -9,8 +9,8 @@ interface GradientButtonProps {
   label: string;
   onPress: () => void;
   gradient?: string[];
-  style?: ViewStyle;
-  textStyle?: TextStyle;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
   loading?: boolean;
   disabled?: boolean;
   variant?: 'primary' | 'secondary' | 'accent';
