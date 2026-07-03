@@ -341,7 +341,7 @@ function AddHabitModal({ visible, onClose }: { visible: boolean; onClose: () => 
   const activeCfg = CATEGORY_CONFIG[category];
 
   return (
-    <Modal visible={visible} animationType="none" transparent onRequestClose={dismiss}>
+    <Modal visible={visible} animationType="none" transparent onRequestClose={dismiss} supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}>
       <Animated.View style={[styles.modalOverlay, { opacity: overlayOpacity }]}>
         <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={dismiss} />
         <Animated.View style={[styles.modalSheet, { transform: [{ translateY: sheetY }] }]}>
@@ -537,7 +537,7 @@ function HabitEditSheet({ habit, onClose }: { habit: Habit | null; onClose: () =
   };
 
   return (
-    <Modal visible={!!habit} animationType="none" transparent onRequestClose={dismiss}>
+    <Modal visible={!!habit} animationType="none" transparent onRequestClose={dismiss} supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}>
       <Animated.View style={[styles.modalOverlay, { opacity: overlayOpacity }]}>
         <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={dismiss} />
         <Animated.View style={[styles.modalSheet, { transform: [{ translateY: sheetY }] }]}>
@@ -809,7 +809,7 @@ function AddStackModal({ visible, onClose, habits }: {
   };
 
   return (
-    <Modal visible={visible} animationType="none" transparent onRequestClose={dismiss}>
+    <Modal visible={visible} animationType="none" transparent onRequestClose={dismiss} supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}>
       <Animated.View style={[stackModalStyles.overlay, { opacity: overlayOpacity }]}>
         <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={dismiss} />
         <Animated.View style={[stackModalStyles.sheet, { transform: [{ translateY: sheetY }] }]}>

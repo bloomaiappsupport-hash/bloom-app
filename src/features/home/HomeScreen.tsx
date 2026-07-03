@@ -245,7 +245,7 @@ function NotificationCenter({ visible, onClose }: { visible: boolean; onClose: (
   };
 
   return (
-    <Modal visible={visible} animationType="none" transparent onRequestClose={handleClose}>
+    <Modal visible={visible} animationType="none" transparent onRequestClose={handleClose} supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}>
       <Animated.View style={[notifStyles.overlayBase, { opacity: overlayOpacity }]}>
         <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={handleClose} />
         <Animated.View

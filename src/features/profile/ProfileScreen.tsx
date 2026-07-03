@@ -210,7 +210,7 @@ function PasswordModal({ visible, onClose }: { visible: boolean; onClose: () => 
   if (!visible) return null;
 
   return (
-    <Modal transparent animationType="none" visible={visible} onRequestClose={onClose}>
+    <Modal transparent animationType="none" visible={visible} onRequestClose={onClose} supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <Animated.View style={[modalStyles.overlay, { opacity: fadeAnim }]}>
           <Animated.View style={[modalStyles.card, { backgroundColor: '#120830', transform: [{ scale: scaleAnim }] }]}>
@@ -321,7 +321,7 @@ function BloomModal({ config, onClose }: { config: ModalConfig | null; onClose: 
   };
 
   return (
-    <Modal transparent animationType="none" visible={!!config} onRequestClose={onClose}>
+    <Modal transparent animationType="none" visible={!!config} onRequestClose={onClose} supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}>
       <Animated.View style={[modalStyles.overlay, { opacity: fadeAnim }]}>
         <Animated.View style={[
           modalStyles.card,
