@@ -14,6 +14,7 @@ import { colors, typography, spacing, radius } from '../../theme';
 import { authService } from '../../services/supabase';
 import { GradientButton } from '../../components/common';
 import { getErrorMessage } from '../../utils/errorMessage';
+import BloomLogo from '../../components/common/BloomLogo';
 
 function GoogleIcon({ size = 20 }: { size?: number }) {
   return (
@@ -192,7 +193,8 @@ export default function RegisterScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.header}>
-            <Text style={styles.title}>{t('auth.signUp')}</Text>
+            <BloomLogo size={72} />
+            <Text style={styles.title}>BLOOM</Text>
             <Text style={styles.subtitle}>{t('auth.signUpSubtitle')}</Text>
           </View>
 
@@ -305,9 +307,21 @@ const styles = StyleSheet.create({
     paddingBottom: spacing['3xl'],
     paddingTop: spacing['2xl'],
   },
-  header: { marginBottom: spacing['2xl'] },
-  title: { ...typography.h1, color: colors.textPrimary, marginBottom: spacing.sm },
-  subtitle: { ...typography.body, color: colors.textSecondary },
+  header: {
+    alignItems: 'center',
+    paddingTop: spacing['2xl'],
+    marginBottom: spacing['2xl'],
+    gap: spacing.sm,
+  },
+  title: {
+    ...typography.h2,
+    color: colors.textPrimary,
+    letterSpacing: 6,
+  },
+  subtitle: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
   form: { gap: spacing.base },
   inputWrapper: { gap: spacing.xs },
   inputLabel: { ...typography.smallMedium, color: colors.textSecondary },
