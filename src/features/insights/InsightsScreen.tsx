@@ -12,6 +12,9 @@ import { GlassCard, ScreenContainer } from '../../components/common';
 import { supabase } from '../../services/supabase/client';
 import { habitsService } from '../../services/supabase/habits';
 import { HabitCategory } from '../../types';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../navigation/types';
 
 const { width } = Dimensions.get('window');
 
@@ -150,7 +153,8 @@ export default function InsightsScreen() {
     custom: colors.primary,
   }), [colors]);
 
-  const { user } = useAuthStore();
+  const { user, plan } = useAuthStore();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [countsByDate, setCountsByDate] = useState<Record<string, number>>({});
   const [longestStreakDB, setLongestStreakDB] = useState(0);
   const [catDaysHistory, setCatDaysHistory] = useState<Record<string, number>>({});
@@ -224,6 +228,10 @@ export default function InsightsScreen() {
   const [insightError, setInsightError] = useState('');
 
   const fetchWeeklyInsight = async () => {
+    if (plan !== 'premium') {
+      navigation.navigate('Paywall');
+      return;
+    }
     if (loadingInsight || weeklyInsight) return;
     setLoadingInsight(true);
     setInsightError('');

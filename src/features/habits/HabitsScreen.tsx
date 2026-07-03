@@ -1036,7 +1036,13 @@ export default function HabitsScreen() {
               </Svg>
             </View>
             <Text style={[styles.groupLabel, { flex: 1 }]}>{t('habits.stacks')}</Text>
-            <TouchableOpacity onPress={() => setShowAddStack(true)} activeOpacity={0.8}
+            <TouchableOpacity onPress={() => {
+              if (plan !== 'premium') {
+                navigation.navigate('Paywall');
+              } else {
+                setShowAddStack(true);
+              }
+            }} activeOpacity={0.8}
               style={{ backgroundColor: colors.secondary + '20', paddingHorizontal: spacing.sm, paddingVertical: 4, borderRadius: radius.full }}>
               <Text style={{ ...typography.captionBold, color: colors.secondary }}>{t('habits.createStack')}</Text>
             </TouchableOpacity>
