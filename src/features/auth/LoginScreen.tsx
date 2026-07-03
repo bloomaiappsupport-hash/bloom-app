@@ -184,11 +184,12 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: spacing.base,
     paddingBottom: spacing['2xl'],
+    paddingTop: Platform.OS === 'ios' && Platform.isPad ? 0 : spacing.sm,
   },
   logoArea: {
     alignItems: 'center',
-    paddingTop: spacing['2xl'],
-    marginBottom: spacing['2xl'],
+    paddingTop: Platform.OS === 'ios' && Platform.isPad ? spacing['2xl'] : spacing.xs,
+    marginBottom: Platform.OS === 'ios' && Platform.isPad ? spacing['2xl'] : spacing.md,
     gap: spacing.sm,
   },
   appName: {
