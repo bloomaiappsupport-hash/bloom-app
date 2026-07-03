@@ -32,6 +32,8 @@ const SLIDE_KEYS = [
   { key: '5', tKey: 'onboarding.step5', accentColor: colors.primaryGlow, Illustration: IllustrationReady },
 ];
 
+const isPad = Platform.OS === 'ios' && Platform.isPad;
+
 function Slide({
   item,
   index,
@@ -58,7 +60,7 @@ function Slide({
       </View>
 
       <Animated.View
-        style={[styles.textSection, { opacity: textOpacity, transform: [{ translateY: textTranslateY }] }]}
+        style={[styles.textSection, isPad && { alignSelf: 'center', width: '100%', maxWidth: 680 }, { opacity: textOpacity, transform: [{ translateY: textTranslateY }] }]}
       >
         <Text style={styles.title}>{t(`${item.tKey}.title`)}</Text>
         <Text style={styles.subtitle}>{t(`${item.tKey}.subtitle`)}</Text>
@@ -176,7 +178,7 @@ export default function OnboardingScreen() {
       </View>
 
       {/* CTA */}
-      <View style={styles.ctaArea}>
+      <View style={[styles.ctaArea, isPad && { alignSelf: 'center', width: '100%', maxWidth: 680 }]}>
         <TouchableOpacity onPress={goNext} activeOpacity={0.88} style={styles.ctaTouch}>
           <LinearGradient
             colors={[colors.primary, colors.primaryDim]}

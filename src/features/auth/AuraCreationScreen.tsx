@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: height * 0.18,
     width: width * 0.7,
+    maxWidth: 400,
     alignItems: 'center',
     gap: spacing.sm,
   },

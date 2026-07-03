@@ -21,7 +21,7 @@
       "backgroundColor": "#080812"
     },
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.barangunduz.bloomhabit",
       "buildNumber": "30",
       "requireFullScreen": true,

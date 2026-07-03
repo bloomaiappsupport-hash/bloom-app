@@ -81,6 +81,8 @@ export default function LoginScreen() {
     }
   };
 
+  const isPad = Platform.OS === 'ios' && Platform.isPad;
+
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
       <LinearGradient colors={['#0E0726', colors.bg]} style={StyleSheet.absoluteFill} />
@@ -89,6 +91,7 @@ export default function LoginScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
+          style={[isPad && { alignSelf: 'center', width: '100%', maxWidth: 440 }]}
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"

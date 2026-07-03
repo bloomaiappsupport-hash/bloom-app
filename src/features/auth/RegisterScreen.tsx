@@ -179,11 +179,14 @@ export default function RegisterScreen() {
     if (error) Alert.alert(t('common.error'), getErrorMessage(error, t));
   };
 
+  const isPad = Platform.OS === 'ios' && Platform.isPad;
+
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
       <LinearGradient colors={['#0D0824', colors.bg]} style={StyleSheet.absoluteFill} />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
+          style={[isPad && { alignSelf: 'center', width: '100%', maxWidth: 440 }]}
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"

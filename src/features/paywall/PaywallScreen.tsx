@@ -277,6 +277,8 @@ export default function PaywallScreen() {
   const PRIVACY_URL = 'https://bloomaiappsupport-hash.github.io/Bloom-Website/privacy.html';
   const openURL = (url: string) => Linking.openURL(url).catch(() => {});
 
+  const isPad = Platform.OS === 'ios' && Platform.isPad;
+
   return (
     <View style={styles.root}>
       <LinearGradient
@@ -285,7 +287,7 @@ export default function PaywallScreen() {
         style={StyleSheet.absoluteFill}
       />
 
-      <SafeAreaView style={{ flex: 1 }} edges={['top']}>
+      <SafeAreaView style={[isPad ? { alignSelf: 'center', width: '100%', maxWidth: 680, flex: 1 } : { flex: 1 }]} edges={['top']}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeBtn} activeOpacity={0.7}>
           <IcClose color={colors.textMuted} />
         </TouchableOpacity>

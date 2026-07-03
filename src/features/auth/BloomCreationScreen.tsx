@@ -148,6 +148,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.lg,
     width: '100%',
+    maxWidth: 400,
     paddingHorizontal: spacing['2xl'],
     position: 'absolute',
     bottom: '20%',

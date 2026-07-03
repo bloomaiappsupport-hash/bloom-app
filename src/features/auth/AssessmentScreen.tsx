@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import {
   View, Text, StyleSheet, Dimensions, TouchableOpacity,
-  Animated, SafeAreaView,
+  Animated, SafeAreaView, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
@@ -167,67 +167,71 @@ export default function AssessmentScreen() {
     outputRange: ['0%', '100%'],
   });
 
+  const isPad = Platform.OS === 'ios' && Platform.isPad;
+
   return (
     <View style={styles.container}>
       <LinearGradient colors={['#0D0622', colors.bg]} style={StyleSheet.absoluteFill} />
 
-      {/* Header */}
-      <SafeAreaView>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>{t('assessment.title')}</Text>
-          <Text style={styles.headerSub}>{currentQ + 1} / {QUESTIONS.length}</Text>
+      <View style={isPad ? { alignSelf: 'center', width: '100%', maxWidth: 680, flex: 1 } : { flex: 1 }}>
+        {/* Header */}
+        <SafeAreaView>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>{t('assessment.title')}</Text>
+            <Text style={styles.headerSub}>{currentQ + 1} / {QUESTIONS.length}</Text>
+          </View>
+
+          {/* Progress bar */}
+          <View style={styles.progressTrack}>
+            <Animated.View style={[styles.progressFill, { width: progressWidth }]} />
+          </View>
+        </SafeAreaView>
+
+        {/* Question card */}
+        <Animated.View style={[styles.card, { transform: [{ translateX: cardAnim }] }]}>
+          <Text style={styles.question}>{t(question.questionKey)}</Text>
+
+          <View style={styles.optionsGrid}>
+            {question.options.map((opt) => {
+              const isSelected = selected === opt.value;
+              return (
+                <TouchableOpacity
+                  key={opt.value}
+                  onPress={() => handleSelect(opt.value)}
+                  activeOpacity={0.82}
+                  style={[styles.option, isSelected && { borderColor: opt.iconColor, borderWidth: 1.5 }]}
+                >
+                  {isSelected && (
+                    <LinearGradient
+                      colors={[opt.iconColor + '1E', opt.iconColor + '06']}
+                      style={StyleSheet.absoluteFill}
+                    />
+                  )}
+                  <View style={[styles.iconWrap, { backgroundColor: opt.iconColor + (isSelected ? '22' : '14') }]}>
+                    <opt.Icon size={34} color={isSelected ? opt.iconColor : opt.iconColor + 'AA'} />
+                  </View>
+                  <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
+                    {t(opt.labelKey)}
+                  </Text>
+                  {isSelected && (
+                    <View style={[styles.checkDot, { backgroundColor: opt.iconColor }]} />
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </Animated.View>
+
+        {/* Login link */}
+        <View style={styles.loginRow}>
+          <Text style={styles.loginText}>{t('auth.hasAccount')} </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <Text style={styles.loginLink}>{t('auth.signIn')}</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Progress bar */}
-        <View style={styles.progressTrack}>
-          <Animated.View style={[styles.progressFill, { width: progressWidth }]} />
-        </View>
-      </SafeAreaView>
-
-      {/* Question card */}
-      <Animated.View style={[styles.card, { transform: [{ translateX: cardAnim }] }]}>
-        <Text style={styles.question}>{t(question.questionKey)}</Text>
-
-        <View style={styles.optionsGrid}>
-          {question.options.map((opt) => {
-            const isSelected = selected === opt.value;
-            return (
-              <TouchableOpacity
-                key={opt.value}
-                onPress={() => handleSelect(opt.value)}
-                activeOpacity={0.82}
-                style={[styles.option, isSelected && { borderColor: opt.iconColor, borderWidth: 1.5 }]}
-              >
-                {isSelected && (
-                  <LinearGradient
-                    colors={[opt.iconColor + '1E', opt.iconColor + '06']}
-                    style={StyleSheet.absoluteFill}
-                  />
-                )}
-                <View style={[styles.iconWrap, { backgroundColor: opt.iconColor + (isSelected ? '22' : '14') }]}>
-                  <opt.Icon size={34} color={isSelected ? opt.iconColor : opt.iconColor + 'AA'} />
-                </View>
-                <Text style={[styles.optionLabel, isSelected && styles.optionLabelSelected]}>
-                  {t(opt.labelKey)}
-                </Text>
-                {isSelected && (
-                  <View style={[styles.checkDot, { backgroundColor: opt.iconColor }]} />
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </Animated.View>
-
-      {/* Login link */}
-      <View style={styles.loginRow}>
-        <Text style={styles.loginText}>{t('auth.hasAccount')} </Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Auth', { screen: 'Login' })}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
-          <Text style={styles.loginLink}>{t('auth.signIn')}</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );

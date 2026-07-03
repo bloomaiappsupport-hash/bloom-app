@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -31,10 +31,12 @@ export default function VerifyEmailScreen() {
     }
   };
 
+  const isPad = Platform.OS === 'ios' && Platform.isPad;
+
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
       <LinearGradient colors={['#0D0824', colors.bg]} style={StyleSheet.absoluteFill} />
-      <View style={styles.container}>
+      <View style={[styles.container, isPad && { alignSelf: 'center', width: '100%', maxWidth: 440 }]}>
         <View style={styles.iconWrap}>
           <Text style={styles.icon}>✉️</Text>
         </View>

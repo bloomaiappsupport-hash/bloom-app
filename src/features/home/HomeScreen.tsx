@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Animated, Dimensions, Modal,
+  Animated, Dimensions, Modal, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, LinearGradient as SvgGrad, Stop, Path } from 'react-native-svg';
@@ -464,11 +464,17 @@ export default function HomeScreen() {
     return h.frequency_days.includes(today);
   });
 
+  const isPad = Platform.OS === 'ios' && Platform.isPad;
+
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
       <LinearGradient colors={[colors.gradStart, colors.gradEnd, colors.bg]} style={StyleSheet.absoluteFill} />
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={[isPad && { alignSelf: 'center', width: '100%', maxWidth: 680 }]}
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.greeting}>{greeting}, {firstName}</Text>

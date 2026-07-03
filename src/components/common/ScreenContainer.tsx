@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, StyleSheet, ViewStyle, ScrollView } from 'react-native';
+import { View, StyleSheet, ViewStyle, ScrollView, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { spacing } from '../../theme';
@@ -20,17 +20,18 @@ export default function ScreenContainer({
 }: ScreenContainerProps) {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const isPad = Platform.OS === 'ios' && Platform.isPad;
 
   const content = scrollable ? (
     <ScrollView
-      style={styles.scroll}
+      style={[styles.scroll, isPad && styles.padContent]}
       contentContainerStyle={[padded && styles.paddedContent, style]}
       showsVerticalScrollIndicator={false}
     >
       {children}
     </ScrollView>
   ) : (
-    <View style={[styles.inner, padded && styles.padded, style]}>{children}</View>
+    <View style={[styles.inner, isPad && styles.padContent, padded && styles.padded, style]}>{children}</View>
   );
 
   return (
@@ -52,5 +53,10 @@ function createStyles(c: ReturnType<typeof useColors>) {
     padded: { paddingHorizontal: spacing.base },
     scroll: { flex: 1 },
     paddedContent: { paddingHorizontal: spacing.base, paddingBottom: spacing['4xl'] },
+    padContent: {
+      alignSelf: 'center',
+      width: '100%',
+      maxWidth: 680,
+    },
   });
 }

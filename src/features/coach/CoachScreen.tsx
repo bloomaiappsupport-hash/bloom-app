@@ -170,6 +170,8 @@ export default function CoachScreen() {
     }
   };
 
+  const isPad = Platform.OS === 'ios' && Platform.isPad;
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: colors.bg }}
@@ -177,82 +179,84 @@ export default function CoachScreen() {
       keyboardVerticalOffset={0}
     >
       <LinearGradient colors={['#0D0622', colors.bg]} style={StyleSheet.absoluteFill} />
-      <SafeAreaView edges={['top']}>
-        <View style={styles.header}>
-          <View style={styles.headerOrb}>
-            <LinearGradient colors={[colors.primaryGlow, colors.primaryDim]} style={StyleSheet.absoluteFill} />
-            <BloomLogo size={28} />
+      <View style={isPad ? { alignSelf: 'center', width: '100%', maxWidth: 680, flex: 1 } : { flex: 1 }}>
+        <SafeAreaView edges={['top']}>
+          <View style={styles.header}>
+            <View style={styles.headerOrb}>
+              <LinearGradient colors={[colors.primaryGlow, colors.primaryDim]} style={StyleSheet.absoluteFill} />
+              <BloomLogo size={28} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.headerTitle}>{t('coach.title')}</Text>
+              <Text style={styles.headerSub}>
+                {plan === 'free' ? t('coach.messagesLeft', { count: DAILY_FREE_LIMIT - msgCount }) : t('coach.premiumUnlimited')}
+              </Text>
+            </View>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.headerTitle}>{t('coach.title')}</Text>
-            <Text style={styles.headerSub}>
-              {plan === 'free' ? t('coach.messagesLeft', { count: DAILY_FREE_LIMIT - msgCount }) : t('coach.premiumUnlimited')}
-            </Text>
-          </View>
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
 
-      <FlatList
-        ref={listRef}
-        data={messages}
-        keyExtractor={(m) => m.id}
-        renderItem={({ item }) => <MessageBubble msg={item} />}
-        contentContainerStyle={styles.messageList}
-        showsVerticalScrollIndicator={false}
-        ListFooterComponent={loading ? (
-          <View style={styles.typingIndicator}>
-            <ActivityIndicator size="small" color={colors.primary} />
-            <Text style={styles.typingText}>{t('coach.thinking')}</Text>
-          </View>
-        ) : null}
-      />
+        <FlatList
+          ref={listRef}
+          data={messages}
+          keyExtractor={(m) => m.id}
+          renderItem={({ item }) => <MessageBubble msg={item} />}
+          contentContainerStyle={styles.messageList}
+          showsVerticalScrollIndicator={false}
+          ListFooterComponent={loading ? (
+            <View style={styles.typingIndicator}>
+              <ActivityIndicator size="small" color={colors.primary} />
+              <Text style={styles.typingText}>{t('coach.thinking')}</Text>
+            </View>
+          ) : null}
+        />
 
-      <View style={styles.quickPromptsRow}>
-        {QUICK_PROMPTS.map((qp) => (
-          <TouchableOpacity
-            key={qp.label}
-            onPress={() => sendMessage(qp.text)}
-            style={[styles.quickPrompt, { borderColor: qp.color + '40' }]}
-            activeOpacity={0.8}
-          >
-            <View style={[styles.quickPromptDot, { backgroundColor: qp.color }]} />
-            <Text style={[styles.quickPromptLabel, { color: qp.color }]}>{qp.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {isLimited ? (
-        <GlassCard style={styles.limitBanner}>
-          <Text style={styles.limitTitle}>{t('coach.dailyLimitTitle')}</Text>
-          <Text style={styles.limitText}>{t('coach.dailyLimitText')}</Text>
-          <GradientButton
-            label={t('profile.goPremium')}
-            onPress={() => navigation.navigate('Paywall')}
-            style={styles.limitBtn}
-          />
-        </GlassCard>
-      ) : (
-        <View style={[styles.inputRow, { paddingBottom: insets.bottom || spacing.lg }]}>
-          <TextInput
-            style={styles.input}
-            value={input}
-            onChangeText={setInput}
-            placeholder={t('coach.placeholder')}
-            placeholderTextColor={colors.textMuted}
-            multiline
-            maxLength={500}
-            onSubmitEditing={() => sendMessage(input)}
-          />
-          <TouchableOpacity onPress={() => sendMessage(input)} disabled={!input.trim() || loading} activeOpacity={0.8}>
-            <LinearGradient
-              colors={!input.trim() || loading ? [colors.surface, colors.surface] : [colors.primary, colors.primaryDim]}
-              style={styles.sendBtn}
+        <View style={styles.quickPromptsRow}>
+          {QUICK_PROMPTS.map((qp) => (
+            <TouchableOpacity
+              key={qp.label}
+              onPress={() => sendMessage(qp.text)}
+              style={[styles.quickPrompt, { borderColor: qp.color + '40' }]}
+              activeOpacity={0.8}
             >
-              <Text style={styles.sendIcon}>↑</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <View style={[styles.quickPromptDot, { backgroundColor: qp.color }]} />
+              <Text style={[styles.quickPromptLabel, { color: qp.color }]}>{qp.label}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
-      )}
+
+        {isLimited ? (
+          <GlassCard style={styles.limitBanner}>
+            <Text style={styles.limitTitle}>{t('coach.dailyLimitTitle')}</Text>
+            <Text style={styles.limitText}>{t('coach.dailyLimitText')}</Text>
+            <GradientButton
+              label={t('profile.goPremium')}
+              onPress={() => navigation.navigate('Paywall')}
+              style={styles.limitBtn}
+            />
+          </GlassCard>
+        ) : (
+          <View style={[styles.inputRow, { paddingBottom: insets.bottom || spacing.lg }]}>
+            <TextInput
+              style={styles.input}
+              value={input}
+              onChangeText={setInput}
+              placeholder={t('coach.placeholder')}
+              placeholderTextColor={colors.textMuted}
+              multiline
+              maxLength={500}
+              onSubmitEditing={() => sendMessage(input)}
+            />
+            <TouchableOpacity onPress={() => sendMessage(input)} disabled={!input.trim() || loading} activeOpacity={0.8}>
+              <LinearGradient
+                colors={!input.trim() || loading ? [colors.surface, colors.surface] : [colors.primary, colors.primaryDim]}
+                style={styles.sendBtn}
+              >
+                <Text style={styles.sendIcon}>↑</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </KeyboardAvoidingView>
   );
 }
