@@ -141,7 +141,8 @@ export default function InsightsScreen() {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { t } = useTranslation();
-  const { habits, streaks, todayCompletions } = useHabitStore();
+  const { habits, streaks, todayCompletions, getTodayProgress } = useHabitStore();
+  const { total: todayTotalHabits } = getTodayProgress();
 
   const categoryColors = useMemo((): Record<HabitCategory, string> => ({
     fitness: colors.fitness,
@@ -172,7 +173,7 @@ export default function InsightsScreen() {
     return Math.max(max, isNaN(val) ? 0 : val);
   }, 0);
   const longestStreak = Math.max(longestStreakMem, longestStreakDB);
-  const completionRate = habits.length > 0 ? Math.round((todayCompletions.length / habits.length) * 100) : 0;
+  const completionRate = todayTotalHabits > 0 ? Math.round((todayCompletions.length / todayTotalHabits) * 100) : 0;
 
   useEffect(() => {
     if (!user?.id) return;
@@ -213,7 +214,7 @@ export default function InsightsScreen() {
       }, 0);
       setLongestStreakDB(max);
     });
-  }, [user?.id, habits]);
+  }, [user?.id, habits, todayCompletions.length]);
 
   const isTurkishUser = (() => {
     const locale = Localization.getLocales()[0];
@@ -277,7 +278,7 @@ export default function InsightsScreen() {
 
       <GlassCard style={styles.weekCard}>
         <Text style={styles.sectionTitle}>{t('insights.thisWeek')}</Text>
-        <WeekHeatmap countsByDate={countsByDate} totalHabits={habits.length} />
+        <WeekHeatmap countsByDate={countsByDate} totalHabits={todayTotalHabits} />
       </GlassCard>
 
       <GlassCard style={styles.insightCard}>
