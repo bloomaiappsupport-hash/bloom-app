@@ -45,12 +45,11 @@ const getIsTurkish = (): boolean => {
 const isTurkish = getIsTurkish();
 
 const FEATURES = [
-  { label: 'Sınırsız alışkanlık', free: '5 alışkanlık', premium: 'Sınırsız' },
+  { label: 'Sınırsız alışkanlık', free: '3 alışkanlık', premium: 'Sınırsız' },
   { label: 'AI Koç mesajı', free: '3/gün', premium: 'Sınırsız' },
   { label: 'Streak Kalkanı', free: '—', premium: '2/ay' },
   { label: 'Habit DNA raporu', free: 'Temel', premium: 'Detaylı + Paylaşım' },
   { label: 'Haftalık AI raporu', free: '—', premium: 'Her hafta' },
-  { label: 'Veri geçmişi', free: '30 gün', premium: 'Sınırsız' },
 ];
 
 const FALLBACK = {
