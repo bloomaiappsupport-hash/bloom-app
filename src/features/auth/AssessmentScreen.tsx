@@ -21,7 +21,9 @@ import {
 } from '../../components/assessment/AssessmentIcons';
 
 const { width } = Dimensions.get('window');
-const OPTION_W = (width - spacing.base * 2 - spacing.md) / 2;
+const isPad = Platform.OS === 'ios' && Platform.isPad;
+const LAYOUT_WIDTH = isPad ? 680 : width;
+const OPTION_W = (LAYOUT_WIDTH - spacing.base * 2 - spacing.md) / 2;
 type Nav = StackNavigationProp<RootStackParamList, 'Assessment'>;
 type IconComponent = React.FC<{ size?: number; color?: string }>;
 
@@ -282,7 +284,7 @@ const styles = StyleSheet.create({
   },
   option: {
     width: OPTION_W,
-    height: OPTION_W,
+    height: isPad ? 140 : OPTION_W,
     backgroundColor: colors.surface,
     borderRadius: radius.xl,
     borderWidth: 1,

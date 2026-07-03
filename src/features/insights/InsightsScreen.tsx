@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Polygon, Circle, Line, Text as SvgText } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +23,9 @@ const RADAR_CATEGORIES: HabitCategory[] = ['fitness', 'mind', 'sleep', 'nutritio
 function RadarChart({ scores }: { scores: Record<string, number> }) {
   const colors = useColors();
   const { t } = useTranslation();
-  const size = width - spacing.base * 4;
+  const isPad = Platform.OS === 'ios' && Platform.isPad;
+  const layoutWidth = isPad ? 680 : width;
+  const size = layoutWidth - spacing.base * 4;
   const cx = size / 2;
   const cy = size / 2;
   const r = size * 0.35;
