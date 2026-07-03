@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const cors = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 // Ücretsiz kullanıcı için günlük mesaj limiti (sunucu tarafı = gerçek kilit).
@@ -79,10 +80,18 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) return json({ error: 'Unauthorized' }, 401);
 
-    const { messages, context, isPremium: clientPremium } = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: 'Invalid JSON body' }, 400);
+    }
+    const { messages, context, isPremium: clientPremium } = body || {};
 
     // Prompt injection kontrolü — son kullanıcı mesajını kontrol et
-    const lastUserMsg = messages?.findLast?.((m: { role: string }) => m.role === 'user');
+    const lastUserMsg = messages && Array.isArray(messages)
+      ? [...messages].reverse().find((m: { role: string }) => m.role === 'user')
+      : undefined;
     if (lastUserMsg && detectInjection(lastUserMsg.content ?? '')) {
       const safeReply = 'Bu konuda sana yardımcı olamam — ama alışkanlıkların ve hedeflerin hakkında konuşmak için buradayım!';
       const serviceClient = createClient(
@@ -156,7 +165,10 @@ serve(async (req) => {
     });
 
     const data = await openaiRes.json();
-    if (!openaiRes.ok) return json({ error: 'Service unavailable' }, openaiRes.status);
+    if (!openaiRes.ok) {
+      console.error('OpenAI API Error:', data);
+      return json({ error: 'Service unavailable' }, openaiRes.status);
+    }
 
     const reply = data.choices?.[0]?.message?.content ?? '';
 
