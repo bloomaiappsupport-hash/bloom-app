@@ -92,7 +92,7 @@ export default function LoginScreen() {
       >
         <ScrollView
           style={[isPad && { alignSelf: 'center', width: '100%', maxWidth: 440 }]}
-          contentContainerStyle={[styles.scroll, isPad && { flexGrow: 1, justifyContent: 'center', paddingBottom: spacing['4xl'] }]}
+          contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
@@ -187,8 +187,8 @@ const styles = StyleSheet.create({
   },
   logoArea: {
     alignItems: 'center',
-    paddingTop: Platform.OS === 'ios' && Platform.isPad ? spacing['2xl'] : spacing.sm,
-    marginBottom: Platform.OS === 'ios' && Platform.isPad ? spacing['2xl'] : spacing.md,
+    paddingTop: spacing['2xl'],
+    marginBottom: spacing['2xl'],
     gap: spacing.sm,
   },
   appName: {
