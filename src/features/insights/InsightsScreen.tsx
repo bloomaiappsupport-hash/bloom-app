@@ -93,7 +93,7 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
   );
 }
 
-function WeekHeatmap({ countsByDate }: { countsByDate: Record<string, number> }) {
+function WeekHeatmap({ countsByDate, totalHabitsCount }: { countsByDate: Record<string, number>; totalHabitsCount: number }) {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { t } = useTranslation();
@@ -112,12 +112,12 @@ function WeekHeatmap({ countsByDate }: { countsByDate: Record<string, number> })
     };
   });
 
-  const maxCount = Math.max(...week.map((d) => d.count), 1);
+  const denominator = Math.max(1, totalHabitsCount);
 
   return (
     <View style={styles.heatmapRow}>
       {week.map((day, i) => {
-        const intensity = day.count / maxCount;
+        const intensity = Math.min(1, day.count / denominator);
         return (
           <View key={i} style={styles.heatmapCell}>
             <View style={[
@@ -277,7 +277,7 @@ export default function InsightsScreen() {
 
       <GlassCard style={styles.weekCard}>
         <Text style={styles.sectionTitle}>{t('insights.thisWeek')}</Text>
-        <WeekHeatmap countsByDate={countsByDate} />
+        <WeekHeatmap countsByDate={countsByDate} totalHabitsCount={habits.length} />
       </GlassCard>
 
       <GlassCard style={styles.insightCard}>
