@@ -4,6 +4,7 @@ import {
   KeyboardAvoidingView, Platform, Alert,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { colors, typography, spacing, radius } from '../../theme';
@@ -26,48 +27,54 @@ export default function ForgotPasswordScreen() {
     else setSent(true);
   };
 
+  const isPad = Platform.OS === 'ios' && Platform.isPad;
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <LinearGradient colors={['#0D0824', colors.bg]} style={StyleSheet.absoluteFill} />
-      <View style={styles.container}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>{t('auth.backBtn')}</Text>
-        </TouchableOpacity>
+      <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
+        <View style={[styles.container, isPad && { alignSelf: 'center', width: '100%', maxWidth: 440, flex: 1 }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+            <Text style={styles.backText}>{t('auth.backBtn')}</Text>
+          </TouchableOpacity>
 
-        {!sent ? (
-          <>
-            <Text style={styles.title}>{t('auth.forgotTitle')}</Text>
-            <Text style={styles.subtitle}>{t('auth.forgotSubtitle')}</Text>
-            <View style={styles.inputWrapper}>
-              <Text style={styles.inputLabel}>{t('auth.email')}</Text>
-              <TextInput
-                style={styles.input}
-                value={email}
-                onChangeText={setEmail}
-                placeholder={t('auth.emailPlaceholder')}
-                placeholderTextColor={colors.textMuted}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
-            <GradientButton label={t('auth.sendLink')} onPress={handleReset} loading={loading} style={styles.btn} />
-          </>
-        ) : (
-          <View style={styles.sentArea}>
-            <Text style={styles.sentIcon}>📬</Text>
-            <Text style={styles.sentTitle}>{t('auth.sentTitle')}</Text>
-            <Text style={styles.sentSub}>{t('auth.sentMessage', { email })}</Text>
-            <GradientButton label={t('auth.backToLogin')} onPress={() => navigation.goBack()} style={styles.btn} />
+          <View style={isPad ? { flex: 1, justifyContent: 'center', paddingBottom: 100 } : { flex: 1 }}>
+            {!sent ? (
+              <>
+                <Text style={styles.title}>{t('auth.forgotTitle')}</Text>
+                <Text style={styles.subtitle}>{t('auth.forgotSubtitle')}</Text>
+                <View style={styles.inputWrapper}>
+                  <Text style={styles.inputLabel}>{t('auth.email')}</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder={t('auth.emailPlaceholder')}
+                    placeholderTextColor={colors.textMuted}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+                <GradientButton label={t('auth.sendLink')} onPress={handleReset} loading={loading} style={styles.btn} />
+              </>
+            ) : (
+              <View style={styles.sentArea}>
+                <Text style={styles.sentIcon}>📬</Text>
+                <Text style={styles.sentTitle}>{t('auth.sentTitle')}</Text>
+                <Text style={styles.sentSub}>{t('auth.sentMessage', { email })}</Text>
+                <GradientButton label={t('auth.backToLogin')} onPress={() => navigation.goBack()} style={styles.btn} />
+              </View>
+            )}
           </View>
-        )}
-      </View>
+        </View>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: spacing.base },
-  backBtn: { paddingTop: 60, paddingBottom: spacing['2xl'] },
+  backBtn: { paddingTop: Platform.OS === 'ios' ? (Platform.isPad ? 16 : 60) : 16, paddingBottom: spacing['2xl'] },
   backText: { ...typography.bodyMedium, color: colors.textSecondary },
   title: { ...typography.h1, color: colors.textPrimary, marginBottom: spacing.md },
   subtitle: { ...typography.body, color: colors.textSecondary, marginBottom: spacing['2xl'], lineHeight: 24 },

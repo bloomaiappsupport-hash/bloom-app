@@ -92,7 +92,7 @@ export default function LoginScreen() {
       >
         <ScrollView
           style={[isPad && { alignSelf: 'center', width: '100%', maxWidth: 440 }]}
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={[styles.scroll, isPad && { flexGrow: 1, justifyContent: 'center', paddingBottom: spacing['4xl'] }]}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
