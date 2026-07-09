@@ -45,3 +45,7 @@ google-service-account.json
 /ios
 /android
 supabase/.temp
+
+# Claude IDE settings
+.claude/
+

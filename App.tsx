@@ -41,7 +41,7 @@ import { useAuthStore } from './src/stores/authStore';
 import { useHabitStore } from './src/stores/habitStore';
 import { useLanguageStore } from './src/stores/languageStore';
 
-// SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -106,7 +106,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (splashReady) SplashScreen.hideAsync().catch(() => {});
+    if (splashReady) SplashScreen.hideAsync().catch(() => { });
   }, [splashReady]);
 
   const loadUserData = async (userId: string) => {
