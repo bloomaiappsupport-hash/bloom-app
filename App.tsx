@@ -1,9 +1,12 @@
 import 'react-native-url-polyfill/auto';
 import './src/i18n';
-import React, { useEffect, useState } from 'react';
-import { LogBox, Linking } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { LogBox, Linking, Animated, View, Text, StyleSheet } from 'react-native';
 import { supabase } from './src/services/supabase/client';
 import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
+import BloomLogo from './src/components/common/BloomLogo';
+import { colors, typography } from './src/theme';
 
 LogBox.ignoreLogs([
   'InteractionManager',
@@ -72,8 +75,8 @@ const handleAuthDeepLink = async (url: string) => {
 };
 
 function App() {
-  const { setSession, setLoading, setProfile, setPlan } = useAuthStore();
-  const { setHabits, setTodayCompletions, setStreak, setLoadingData } = useHabitStore();
+  const { isLoading, setSession, setLoading, setProfile, setPlan } = useAuthStore();
+  const { setHabits, setTodayCompletions, setStreak, isLoadingData, setLoadingData } = useHabitStore();
   const { loadLanguage } = useLanguageStore();
 
   const [fontsLoaded] = useFonts({
@@ -83,7 +86,30 @@ function App() {
     Inter_700Bold,
     Inter_800ExtraBold,
   });
+
   const [splashReady, setSplashReady] = useState(false);
+  const [splashFinished, setSplashFinished] = useState(false);
+
+  // Splash animation values
+  const splashOpacity = useRef(new Animated.Value(1)).current;
+  const logoScale = useRef(new Animated.Value(0.5)).current;
+  const logoOpacity = useRef(new Animated.Value(0)).current;
+  const textOpacity = useRef(new Animated.Value(0)).current;
+  const textY = useRef(new Animated.Value(10)).current;
+
+  // Run entry animation for logo and text
+  useEffect(() => {
+    Animated.sequence([
+      Animated.parallel([
+        Animated.spring(logoScale, { toValue: 1, tension: 60, friction: 8, useNativeDriver: true }),
+        Animated.timing(logoOpacity, { toValue: 1, duration: 550, useNativeDriver: true }),
+      ]),
+      Animated.parallel([
+        Animated.timing(textOpacity, { toValue: 1, duration: 380, useNativeDriver: true }),
+        Animated.timing(textY, { toValue: 0, duration: 380, useNativeDriver: true }),
+      ]),
+    ]).start();
+  }, []);
 
   useEffect(() => {
     loadLanguage();
@@ -95,19 +121,39 @@ function App() {
     return () => sub.remove();
   }, []);
 
-  // Hide splash when fonts load, or after 4s max to avoid infinite stuck screen
+  // Hide native splash when fonts load, or after 4s max
   useEffect(() => {
     if (fontsLoaded) setSplashReady(true);
   }, [fontsLoaded]);
 
   useEffect(() => {
-    const t = setTimeout(() => setSplashReady(true), 4000);
+    const t = setTimeout(() => {
+      setSplashReady(true);
+      setLoading(false);
+      setLoadingData(false);
+    }, 4000);
     return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
     if (splashReady) SplashScreen.hideAsync().catch(() => { });
   }, [splashReady]);
+
+  // Fade out React Native splash overlay when fonts, session, and data are ready
+  const isDataReady = fontsLoaded && !isLoading && !isLoadingData;
+
+  useEffect(() => {
+    if (isDataReady) {
+      const t = setTimeout(() => {
+        Animated.timing(splashOpacity, {
+          toValue: 0,
+          duration: 450,
+          useNativeDriver: true,
+        }).start(() => setSplashFinished(true));
+      }, 1000);
+      return () => clearTimeout(t);
+    }
+  }, [isDataReady]);
 
   const loadUserData = async (userId: string) => {
     setLoadingData(true);
@@ -120,9 +166,6 @@ function App() {
       SecureStore.getItemAsync('bloom_active_plan_sku'),
     ]);
     if (profileRes.data) setProfile(profileRes.data);
-    // Tek doğru kaynak = subscriptions tablosu (süre kontrolüyle).
-    // Yerel SKU (localSku) yalnızca tablo okunamadığında (ağ hatası) veya 
-    // yerel satın alım mevcut olup veritabanı eşleşmediğinde (sandbox testlerinde) premium'u korumak için yedektir.
     const sub = subscriptionRes.data;
     const dbActive =
       sub?.plan === 'premium' &&
@@ -138,18 +181,39 @@ function App() {
   };
 
   useEffect(() => {
-    authService.getSession().then(({ data }) => {
-      setSession(data.session);
-      if (data.session?.user) loadUserData(data.session.user.id);
+    const sessionTimeout = setTimeout(() => {
       setLoading(false);
-    }).catch(() => setLoading(false));
+      setLoadingData(false);
+    }, 2500);
+
+    authService.getSession().then(({ data }) => {
+      clearTimeout(sessionTimeout);
+      setSession(data.session);
+      if (data.session?.user) {
+        loadUserData(data.session.user.id);
+      } else {
+        setLoadingData(false);
+      }
+      setLoading(false);
+    }).catch(() => {
+      clearTimeout(sessionTimeout);
+      setLoading(false);
+      setLoadingData(false);
+    });
 
     const { data: listener } = authService.onAuthStateChange(async (event, session) => {
       setSession(session);
-      if (session?.user) await loadUserData(session.user.id);
+      if (session?.user) {
+        await loadUserData(session.user.id);
+      } else {
+        setLoadingData(false);
+      }
     });
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      clearTimeout(sessionTimeout);
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   if (!splashReady) return null;
@@ -160,10 +224,51 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <StatusBar style="light" />
           <RootNavigator />
+
+          {!splashFinished && (
+            <Animated.View pointerEvents="none" style={[styles.splashContainer, { opacity: splashOpacity }]}>
+              <LinearGradient colors={['#0D0622', '#080812', '#0A0A1A']} style={StyleSheet.absoluteFill} />
+              
+              <Animated.View style={{ transform: [{ scale: logoScale }], opacity: logoOpacity }}>
+                <BloomLogo size={88} />
+              </Animated.View>
+
+              <Animated.View style={[styles.textBlock, { opacity: textOpacity, transform: [{ translateY: textY }] }]}>
+                <Text style={styles.appName}>BLOOM</Text>
+                <Text style={styles.tagline}>Alışkanlıkların çiçekleniyor</Text>
+              </Animated.View>
+            </Animated.View>
+          )}
         </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  splashContainer: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: '#080812',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 24,
+    zIndex: 99999,
+  },
+  textBlock: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  appName: {
+    ...typography.display,
+    color: colors.textPrimary,
+    letterSpacing: 10,
+    fontSize: 32,
+  },
+  tagline: {
+    ...typography.small,
+    color: colors.textSecondary,
+    letterSpacing: 0.6,
+  },
+});
 
 export default App;

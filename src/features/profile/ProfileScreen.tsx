@@ -703,7 +703,7 @@ export default function ProfileScreen() {
         <Text style={styles.signOutText}>{t('profile.signOut')}</Text>
       </TouchableOpacity>
 
-      <Text style={styles.version}>{t('profile.version', { version: '1.0.0' })}</Text>
+      <Text style={styles.version}>{t('profile.version', { version: '1.0.1' })}</Text>
     </ScreenContainer>
     </>
   );

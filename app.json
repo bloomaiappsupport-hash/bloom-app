@@ -3,7 +3,7 @@
     "name": "BLOOM",
     "slug": "bloom-habit-coach",
     "scheme": "bloom",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "locales": {
       "en": "./locales/en.json",
       "tr": "./locales/tr.json"
@@ -22,7 +22,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.barangunduz.bloomhabit",
-      "buildNumber": "32",
+      "buildNumber": "36",
       "requireFullScreen": true,
       "infoPlist": {
         "NSUserNotificationsUsageDescription": "BLOOM seni doğru zamanda hatırlatmak için bildirimlere ihtiyaç duyar.",
@@ -45,7 +45,7 @@
     },
     "android": {
       "package": "com.barangunduz.bloomhabit",
-      "versionCode": 2,
+      "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./assets/android-icon-foreground.png",
         "monochromeImage": "./assets/android-icon-monochrome.png",
