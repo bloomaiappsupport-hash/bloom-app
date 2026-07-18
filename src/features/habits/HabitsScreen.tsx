@@ -90,45 +90,19 @@ function getCategoryConfig(c: ReturnType<typeof useColors>, t: (k: string) => st
   };
 }
 
-function HabitCard({ habit, streak, shields, onPress }: { habit: Habit; streak?: number; shields?: number; onPress?: () => void }) {
+function HabitCard({ habit, streak, onPress }: { habit: Habit; streak?: number; onPress?: () => void }) {
   const colors = useColors();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { t } = useTranslation();
   const CATEGORY_CONFIG = useMemo(() => getCategoryConfig(colors, t), [colors, t]);
-  const { removeHabit, useShield } = useHabitStore();
-  const { plan } = useAuthStore();
+  const { removeHabit } = useHabitStore();
   const cfg = CATEGORY_CONFIG[habit.category];
-
-  const handleUseShield = () => {
-    if (!shields || shields <= 0) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert(
-      t('habits.shieldTitle'),
-      t('habits.shieldMessage', { title: habit.title, shields }),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.done'),
-          onPress: async () => {
-            const updated = useShield(habit.id);
-            if (updated) {
-              await habitsService.upsertStreak(updated);
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            }
-          },
-        },
-      ],
-    );
-  };
 
   const handleLongPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     const options: any[] = [
       { text: t('common.cancel'), style: 'cancel' },
     ];
-    if (plan === 'premium' && shields && shields > 0) {
-      options.push({ text: t('habits.useShield', { count: shields }), onPress: handleUseShield });
-    }
     options.push({
       text: t('common.delete'), style: 'destructive', onPress: async () => {
         await habitsService.deleteHabit(habit.id);
@@ -163,16 +137,6 @@ function HabitCard({ habit, streak, shields, onPress }: { habit: Habit; streak?:
               <View style={styles.streakBadge}>
                 <IcFlame size={14} color={colors.accent} />
                 <Text style={styles.streakNum}>{streak}</Text>
-              </View>
-            )}
-            {plan === 'premium' && shields !== undefined && shields > 0 && (
-              <View style={[styles.streakBadge, { marginTop: 4 }]}>
-                <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-                  <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-                    stroke={colors.secondary} strokeWidth="1.8" strokeLinejoin="round"
-                    fill={colors.secondary + '20'} />
-                </Svg>
-                <Text style={[styles.streakNum, { color: colors.secondary }]}>{shields}</Text>
               </View>
             )}
           </View>
@@ -562,16 +526,6 @@ function HabitEditSheet({ habit, onClose }: { habit: Habit | null; onClose: () =
                 <Text style={[editSheetStyles.streakVal, { color: colors.secondary }]}>{streak.longest_streak}</Text>
                 <Text style={[editSheetStyles.streakLbl, { color: colors.textMuted }]}>{t('habits.bestLabel')}</Text>
               </View>
-              {streak.shields_remaining > 0 && (
-                <View style={[editSheetStyles.streakBox, { backgroundColor: colors.info + '15', borderColor: colors.info + '30' }]}>
-                  <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-                    <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-                      stroke={colors.info} strokeWidth="1.8" strokeLinejoin="round" fill={colors.info + '20'} />
-                  </Svg>
-                  <Text style={[editSheetStyles.streakVal, { color: colors.info }]}>{streak.shields_remaining}</Text>
-                  <Text style={[editSheetStyles.streakLbl, { color: colors.textMuted }]}>{t('habits.shieldLabel')}</Text>
-                </View>
-              )}
             </View>
           )}
 
@@ -1017,7 +971,6 @@ export default function HabitsScreen() {
                   key={habit.id}
                   habit={habit}
                   streak={streaks[habit.id]?.current_streak}
-                  shields={streaks[habit.id]?.shields_remaining}
                   onPress={() => setEditingHabit(habit)}
                 />
               ))}

@@ -47,7 +47,6 @@ const isTurkish = getIsTurkish();
 const FEATURES = [
   { label: 'Sınırsız alışkanlık', free: '3 alışkanlık', premium: 'Sınırsız' },
   { label: 'AI Koç mesajı', free: '3/gün', premium: 'Sınırsız' },
-  { label: 'Streak Kalkanı', free: '—', premium: '2/ay' },
   { label: 'Habit DNA raporu', free: 'Temel', premium: 'Detaylı + Paylaşım' },
   { label: 'Haftalık AI raporu', free: '—', premium: 'Her hafta' },
 ];
@@ -119,12 +118,6 @@ export default function PaywallScreen() {
   const handlePurchaseSuccess = useCallback(async (purchase: Purchase) => {
     try {
       await finishTransaction({ purchase, isConsumable: false });
-      // If already stored as active, finish silently (pending transaction replay)
-      const alreadyActive = await SecureStore.getItemAsync(ACTIVE_PLAN_KEY);
-      if (alreadyActive === purchase.productId) {
-        setLoading(false);
-        return;
-      }
       // Premium'u İSTEMCİ yazmaz. Apple imzalı fişi sunucuya gönderip
       // doğrulatıyoruz; tabloya yalnızca doğrulanan sonucu sunucu yazar.
       const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-purchase', {

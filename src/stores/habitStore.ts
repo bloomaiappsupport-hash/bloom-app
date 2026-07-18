@@ -15,7 +15,6 @@ interface HabitState {
   addCompletion: (completion: Completion) => void;
   removeCompletion: (habitId: string) => void;
   setStreak: (habitId: string, streak: Streak) => void;
-  useShield: (habitId: string) => Streak | null;
   isCompletedToday: (habitId: string) => boolean;
   getTodayProgress: () => { completed: number; total: number };
   clear: () => void;
@@ -44,19 +43,6 @@ export const useHabitStore = create<HabitState>((set, get) => ({
 
   setStreak: (habitId, streak) =>
     set((s) => ({ streaks: { ...s.streaks, [habitId]: streak } })),
-
-  useShield: (habitId) => {
-    const { streaks } = get();
-    const existing = streaks[habitId];
-    if (!existing || (existing.shields_remaining ?? 0) <= 0) return null;
-    const updated: Streak = {
-      ...existing,
-      shields_remaining: existing.shields_remaining - 1,
-      last_completed_at: new Date().toISOString(),
-    };
-    set((s) => ({ streaks: { ...s.streaks, [habitId]: updated } }));
-    return updated;
-  },
 
   isCompletedToday: (habitId) =>
     get().todayCompletions.some((c) => c.habit_id === habitId),

@@ -15,7 +15,7 @@ Alışkanlık takip uygulamalarından bıktıysan; sadece kutu işaretleyip geç
 Sadece "harika iş!" demez. Geçmiş verilerine, streak geçmişine ve güncel ruh haline bakarak kişisel bariyer analizi yapar. "Stresli günlerde meditasyonu atlıyorsun, seninle konuşalım" der.
 
 **🔥 Streak Takibi**
-Her tamamlama serini büyütür. Premium kullanıcılara aylık 2 Streak Kalkanı — tek bir kaçırdığın gün serisini bitirmesin.
+Her tamamlama serini büyütür; kaçırmadan devam ettikçe motivasyonun artar.
 
 **📊 Haftalık AI Raporu**
 Her hafta sana özel bir analiz: hangi alışkanlıklar geliştikçe, hangileri zorlanıyor, ve önümüzdeki hafta için kişisel öneri paketi.
@@ -32,7 +32,6 @@ Günlük alışkanlıklar tek ekranda. Tamamla, sil, ertele — saniyeler içind
 • Sınırsız alışkanlık (ücretsiz: 5)
 • Sınırsız AI koç mesajı (ücretsiz: 10/gün)
 • Haftalık detaylı AI raporu
-• Streak Kalkanı (2/ay)
 • Detaylı Habit DNA + paylaşım
 • Sınırsız veri geçmişi
 
@@ -62,3 +61,7 @@ Yaşam Tarzı
 
 ## Yaş Derecelendirmesi
 4+ (içerik kısıtlaması yok)
+
+## Yenilikler / Ne Değişti
+Sizin için gelişiyoruz! Bu sürümde performans iyileştirmeleri ve hata düzeltmeleri gerçekleştirdik.
+

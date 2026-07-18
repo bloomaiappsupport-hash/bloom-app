@@ -15,7 +15,7 @@ If you're tired of habit trackers where you just check boxes with no idea why yo
 Not just "great job!" messages. BLOOM analyzes your history, streak patterns, and current mood to give you personalized barrier analysis. "You skip meditation on stressful days — let's talk about that."
 
 **🔥 Streak Tracking**
-Every completion grows your streak. Premium users get 2 Streak Shields per month — one missed day won't break what you've built.
+Every completion grows your streak — stay consistent and watch your momentum build.
 
 **📊 Weekly AI Report**
 A personalized weekly analysis: which habits are improving, which ones are struggling, and a custom recommendation pack for the week ahead.
@@ -32,7 +32,6 @@ Daily habits on one screen. Complete, skip, defer — done in seconds.
 • Unlimited habits (free: 5)
 • Unlimited AI coach messages (free: 10/day)
 • Weekly detailed AI report
-• Streak Shield (2/month)
 • Detailed Habit DNA + sharing
 • Unlimited history
 
@@ -62,3 +61,7 @@ Lifestyle
 
 ## Age Rating
 4+
+
+## What's New
+We are constantly improving for you! This version includes performance improvements and bug fixes.
+

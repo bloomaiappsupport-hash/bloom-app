@@ -36,7 +36,6 @@ import {
   Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
-import * as SecureStore from 'expo-secure-store';
 import RootNavigator from './src/navigation/RootNavigator';
 
 import { authService, profileService, habitsService } from './src/services/supabase';
@@ -157,21 +156,19 @@ function App() {
 
   const loadUserData = async (userId: string) => {
     setLoadingData(true);
-    const [profileRes, subscriptionRes, habitsRes, completionsRes, streaksRes, localSku] = await Promise.all([
+    const [profileRes, subscriptionRes, habitsRes, completionsRes, streaksRes] = await Promise.all([
       profileService.getProfile(userId),
       profileService.getSubscription(userId),
       habitsService.getHabits(userId),
       habitsService.getTodayCompletions(userId),
       habitsService.getAllStreaks(userId),
-      SecureStore.getItemAsync('bloom_active_plan_sku'),
     ]);
     if (profileRes.data) setProfile(profileRes.data);
     const sub = subscriptionRes.data;
     const dbActive =
       sub?.plan === 'premium' &&
       (!sub.expires_at || new Date(sub.expires_at) > new Date());
-    const active = dbActive || !!localSku;
-    setPlan(active ? 'premium' : 'free');
+    setPlan(dbActive ? 'premium' : 'free');
     if (habitsRes.data) setHabits(habitsRes.data);
     if (completionsRes.data) setTodayCompletions(completionsRes.data);
     if (streaksRes.data) {

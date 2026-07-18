@@ -110,7 +110,7 @@ export default function CoachScreen() {
     const locale = Localization.getLocales()[0];
     const region = locale?.regionCode?.toUpperCase();
     const lang = locale?.languageCode?.toLowerCase();
-    const timezone = locale?.timezone ?? '';
+    const timezone = Localization.getCalendars()[0]?.timeZone ?? '';
     return region === 'TR' || lang === 'tr' || timezone.includes('Istanbul');
   })();
 

@@ -86,7 +86,7 @@ serve(async (req) => {
     } catch {
       return json({ error: 'Invalid JSON body' }, 400);
     }
-    const { messages, context, isPremium: clientPremium } = body || {};
+    const { messages, context } = body || {};
 
     // Prompt injection kontrolü — son kullanıcı mesajını kontrol et
     const lastUserMsg = messages && Array.isArray(messages)
@@ -122,7 +122,7 @@ serve(async (req) => {
     const dbActive =
       sub?.plan === 'premium' &&
       (!sub.expires_at || new Date(sub.expires_at) > new Date());
-    const isPremium = dbActive || clientPremium === true;
+    const isPremium = dbActive;
     const model = isPremium ? 'gpt-4o' : 'gpt-4o-mini';
 
     // Sunucu tarafı günlük limit: ücretsiz kullanıcı o gün gönderdiği

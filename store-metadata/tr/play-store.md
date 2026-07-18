@@ -15,7 +15,7 @@ Alışkanlık takip uygulamalarından bıktıysan — sadece kutu işaretleyip g
 Sadece "harika iş!" demez. Geçmiş verilerine, streak geçmişine ve güncel ruh haline bakarak kişisel bariyer analizi yapar.
 
 🔥 STREAK TAKİBİ
-Her tamamlama serini büyütür. Streak Kalkanları — tek bir kaçırdığın gün serisini bitirmesin.
+Her tamamlama serini büyütür; kaçırmadan devam ettikçe motivasyonun artar.
 
 📊 HAFTALIK AI RAPORU
 Her hafta sana özel bir analiz ve önümüzdeki hafta için kişisel öneri paketi.
@@ -32,7 +32,6 @@ BLOOM PREMIUM:
 ✓ Sınırsız alışkanlık (ücretsiz: 5)
 ✓ Sınırsız AI koç mesajı (ücretsiz: 10/gün)
 ✓ Haftalık detaylı AI raporu
-✓ Streak Kalkanı (2/ay)
 ✓ Detaylı Habit DNA + paylaşım
 ✓ Sınırsız veri geçmişi
 
@@ -49,3 +48,7 @@ https://bloom-habit.app/gizlilik
 
 ## E-posta
 barangunduzdesign@gmail.com
+
+## Yenilikler / Ne Değişti
+Sizin için gelişiyoruz! Bu sürümde performans iyileştirmeleri ve hata düzeltmeleri gerçekleştirdik.
+
